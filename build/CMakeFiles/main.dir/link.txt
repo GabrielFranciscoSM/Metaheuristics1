@@ -1,0 +1,1 @@
+/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/main.dir/link.d CMakeFiles/main.dir/main.cpp.o CMakeFiles/main.dir/src/BLsmall.cpp.o CMakeFiles/main.dir/src/greedy.cpp.o CMakeFiles/main.dir/src/lsall.cpp.o CMakeFiles/main.dir/src/pinfluencer.cpp.o CMakeFiles/main.dir/src/randomsearch.cpp.o -o main

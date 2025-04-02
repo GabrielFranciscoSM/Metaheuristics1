@@ -1,0 +1,5 @@
+Best solution:    1940 72 1289 101 296 295 77 1270 300 4034 
+Best fitness:     18
+Mean fitness:     17.66
+Computation time: 13.5777 seconds
+Evaluations:      1000

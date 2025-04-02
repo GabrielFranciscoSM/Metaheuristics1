@@ -1,0 +1,3 @@
+/home/gabriel/clase/MH/P1/build/CMakeFiles/main.dir
+/home/gabriel/clase/MH/P1/build/CMakeFiles/edit_cache.dir
+/home/gabriel/clase/MH/P1/build/CMakeFiles/rebuild_cache.dir
