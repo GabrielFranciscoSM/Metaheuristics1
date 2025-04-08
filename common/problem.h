@@ -47,7 +47,8 @@ public:
   /**
    * Return the current size of the solution.
    */
-  virtual size_t getSolutionSize() = 0; // Get the size of each solution
+  virtual size_t getSolutionSize() = 0; // Get the size of each solutionPro
+  
   /** Return the range of domain of each element of the solution */
   virtual std::pair<tDomain, tDomain> getSolutionDomainRange() = 0;
 };

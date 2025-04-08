@@ -16,6 +16,18 @@
 #include "lsall.h"
 #include "BLsmall.h"
 
+//P2
+
+#include "population.h"
+#include "selectop.h"
+#include "cross_unordered.h"
+#include "cross_ordered.h"
+#include "AGG.h"
+#include "mutateOp.h"
+
+#include "AGE.h"
+#include "AG.h"
+
 using namespace std;
 
 // Function to print usage instructions
@@ -59,7 +71,7 @@ int main(int argc, char *argv[]) {
         printUsage(argv[0]);
         return 1; 
     }
-}
+  }
 
   //files for study
   string files[] = {
@@ -117,10 +129,13 @@ int main(int argc, char *argv[]) {
     Problem *problem = dynamic_cast<Problem *>(&pi);
     
     //Output for the file
-    string output = "output_";
+    string output = "../datos/output_";
     output.append(files[f].substr(9));
     ofstream out(output);
 
+
+    /*
+    
     //Compute algorithm
     for (int i = 0; i < algoritmos.size(); i++) {    
 
@@ -157,6 +172,7 @@ int main(int argc, char *argv[]) {
       }
 
       //File output
+      out << algoritmos[i].first << endl;
       out << "Best solution:    " << bestSol << endl;
       out << "Best fitness:     " << bestFitness << endl;
       out << "Mean fitness:     " << (float)meanFit/5.0 << endl;
@@ -173,6 +189,65 @@ int main(int argc, char *argv[]) {
         std::cout << "Evaluations:      " << (float)meanEvals/5.0 << endl << endl;  
       }
     }
+
+    */
+/*
+    Population pop(10);
+
+    for(int i = 0; i < 10; ++i){
+      tSolution sol = pi.createSolution();
+      pop.push_back_sol(sol,pi.fitness(sol));
+    }
+
+    uniform_int_distribution<int> dist_int(0, pop.getPopulationSize() - 1);
+    SelectOp sel;
+    for(int i = 0; i < 10; ++i){
+      std::cout << sel.select(pop) << endl;
+    }
+*/
+/*
+    tSolution sol1 = pi.createSolution();
+    tSolution sol2 = pi.createSolution();
+
+    cout << sol1 << " " << sol2 << endl;
+
+    CrossUnordered cross;
+    CrossOrdered ordCross;
+
+    ordCross.cross(sol1,sol2);
+
+    cout << sol1 << " " << sol2 << endl;
+
+        AG ag(cross_operators::unordered,problem);
+
+    cout << "POP0 inic" << endl;
+    for(int i = 0; i < ag.getPopulation(0).getPopulationSize(); ++i){
+      cout << ag.getPopulation(0).getSolution(i) << endl;
+    }
+    ag.select_population();
+
+    cout << "POP1 cross" << endl;
+    for(int i = 0; i < ag.getPopulation(1).getPopulationSize(); ++i){
+      cout << ag.getPopulation(1).getSolution(i) << endl;
+    }
+    cout << endl;
+    ag.cross_population(problem);
+
+    cout << "POP1 cross" << endl;
+
+    for(int i = 0; i < ag.getPopulation(1).getPopulationSize(); ++i){
+      cout << ag.getPopulation(1).getSolution(i) << endl;
+    }
+  }
+*/
+
+    AGG ag(AG::cross_operators::unordered,problem);
+
+    cout << endl << ag.optimize(problem,1000).fitness;
+
+    //AGE age(AG::cross_operators::unordered,problem);
+
+    //cout << endl << age.optimize(problem,1000).fitness;
 
   }
 

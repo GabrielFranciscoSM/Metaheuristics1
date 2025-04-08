@@ -1,0 +1,20 @@
+Best solution:    6383 8101 7491 8252 4400 7733 484 7721 5516 2160 
+Best fitness:     11.9
+Mean fitness:     11.52
+Computation time: 12.8339 seconds
+Evaluations:      1000
+Best solution:    4677 2202 5516 8345 6890 8817 3752 3934 570 1612 
+Best fitness:     13.2
+Mean fitness:     12.48
+Computation time: 16.6575 seconds
+Evaluations:      1000
+Best solution:    4285 4666 3825 2655 5516 2937 4220 830 2957 710 
+Best fitness:     11.9
+Mean fitness:     11.26
+Computation time: 16.6663 seconds
+Evaluations:      48.4
+Best solution:    5516 6557 570 8817 6890 2288 6835 8345 4677 7406 
+Best fitness:     13.6
+Mean fitness:     13.6
+Computation time: 16.6732 seconds
+Evaluations:      1

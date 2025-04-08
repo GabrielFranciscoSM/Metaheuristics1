@@ -25,9 +25,9 @@ ResultMH LocalSearchEarlyStop::optimize(Problem *problem, int maxevals)
   int i = 0;
 
   // We pick a random node, checking that it isn't in the solution
-  uniform_int_distribution distRang(problem->getSolutionDomainRange().first,
+  uniform_int_distribution<int> distRang(problem->getSolutionDomainRange().first,
                                       problem->getSolutionDomainRange().second-1);
-  uniform_int_distribution distSol(0, (int)(problem->getSolutionSize() - 1));
+  uniform_int_distribution<int> distSol(0, (int)(problem->getSolutionSize() - 1));
 
   while (i < maxevals && noImprove < 20)
   {
