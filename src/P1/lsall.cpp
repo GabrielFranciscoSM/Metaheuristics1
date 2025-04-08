@@ -21,9 +21,9 @@ ResultMH LocalSearchLl::optimize(Problem *problem, int maxevals)
   float best_fitness = problem->fitness(best);
 
   // We pick a random node, checking that it isn't in the solution
-  uniform_int_distribution distRang(problem->getSolutionDomainRange().first, 
+  uniform_int_distribution<int> distRang(problem->getSolutionDomainRange().first, 
                                     problem->getSolutionDomainRange().second-1);
-  uniform_int_distribution distSol(0, (int)(problem->getSolutionSize() - 1));
+  uniform_int_distribution<int> distSol(0, (int)(problem->getSolutionSize() - 1));
 
   for (int i = 0; i < 10000; i++)
   {

@@ -1,5 +1,20 @@
+Best solution:    261 524 28 2515 2654 1732 259 92 1890 439 
+Best fitness:     12.4
+Mean fitness:     12.28
+Computation time: 0.175465 seconds
+Evaluations:      1000
 Best solution:    1940 72 1289 101 296 295 77 1270 300 4034 
 Best fitness:     18
 Mean fitness:     17.66
-Computation time: 13.5777 seconds
+Computation time: 12.6968 seconds
 Evaluations:      1000
+Best solution:    1463 1591 2234 2713 101 235 3180 462 545 1986 
+Best fitness:     12.3
+Mean fitness:     11.98
+Computation time: 12.7084 seconds
+Evaluations:      45.6
+Best solution:    101 279 265 72 77 288 103 295 296 159 
+Best fitness:     17.8
+Mean fitness:     17.8
+Computation time: 12.7149 seconds
+Evaluations:      1
