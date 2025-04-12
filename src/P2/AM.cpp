@@ -1,0 +1,102 @@
+#include <AM.h>
+#include <iostream>
+#include <util.h>
+
+AM::AM(int LSfase, float LSpercentage, bool orderPob, int LSmaxEvals,cross_operators _crossOp, Problem * problem): 
+AG(_crossOp,problem),
+AGG(_crossOp,problem),
+LSfase(LSfase),
+orderPob(orderPob),
+LSmaxEvals(LSmaxEvals){
+    assert(orderPob >= 0 && orderPob <= 1);
+
+    LSsize = ceil(POP_SIZE*orderPob);
+}
+
+ResultMH AM::optimize(Problem *problem, int maxevals){
+    tFitness bestSolI = 0;
+    float bestFit = 0;
+    tSolution bestSol;
+    int generations = 0;
+    while(this->evaluations < maxevals){
+        //cerr << "EVALUATIONS: " << evaluations << ", Working pop: " << workingPop <<  endl;
+        //cerr << "OLD POP: " << endl;
+        //this->getWorkingPopulation().print_pop();
+
+        this->select();
+        //cerr << "SELECT POP: " << endl;
+        //this->getWorkingPopulation().print_pop();
+        this->cross(problem);
+        //cerr << "CROSS POP: " << this->nCross << endl;
+        //this->getWorkingPopulation().print_pop();
+
+        this->mutate(problem);
+        //cerr << "MUTATE POP: " << this->nMutate << endl;
+        //this->getWorkingPopulation().print_pop();
+
+        generations++;
+        if(generations%LSfase == 0){
+
+            evaluations = applyLocalSearch(problem, evaluations, maxevals);
+        }
+
+        int auxWorstFitness = bestFit;
+        int auxWorstIt = 0;
+        bool downgraded = true;
+
+        for(int i = 0; i < POP_SIZE; ++i){
+            if(this->getWorkingPopulation().getFitness(i) >= bestFit){
+                downgraded = false;
+                bestFit = this->getWorkingPopulation().getFitness(i);
+                bestSol = this->getWorkingPopulation().getSolution(i);
+            }
+
+            if(this->getWorkingPopulation().getFitness(i) <= auxWorstFitness){
+                auxWorstFitness = this->getWorkingPopulation().getFitness(i);
+                auxWorstIt = i;
+            }
+        }
+
+        if(downgraded){
+            this->getWorkingPopulation().insert_sol(auxWorstIt,bestSol,bestFit);
+        }
+
+        workingPop = (workingPop+1)%2;
+    }
+
+    return ResultMH(bestSol,bestFit,this->evaluations);
+}
+
+int AM::applyLocalSearch(Problem *problem, int evaluations, int maxEvals){
+    
+    int realMaxEvals = min(LSmaxEvals,maxEvals-evaluations);
+
+    int i = 0;
+
+    if(this->orderPob){
+        vector<int> orderedIndex = this->getWorkingPopulation().getSortedIndex();
+
+        while(i < LSsize && realMaxEvals > 0){
+            ResultMH res = LS.optimizeSolution(this->getWorkingPopulation().getSolution(orderedIndex.at(i)),problem,realMaxEvals);
+            this->getWorkingPopulation().insert_sol(orderedIndex.at(i),res.solution,res.fitness);
+            evaluations += res.evaluations;
+    
+            realMaxEvals = min(LSmaxEvals,maxEvals-evaluations);
+    
+            ++i;
+        }
+    }
+    else{
+        while(i < LSsize && realMaxEvals > 0){
+            ResultMH res = LS.optimizeSolution(this->getWorkingPopulation().getSolution(i),problem,realMaxEvals);
+            this->getWorkingPopulation().insert_sol(i,res.solution,res.fitness);
+            evaluations += res.evaluations;
+    
+            realMaxEvals = min(LSmaxEvals,maxEvals-evaluations);
+    
+            ++i;
+        }
+    }
+
+    return evaluations;
+}

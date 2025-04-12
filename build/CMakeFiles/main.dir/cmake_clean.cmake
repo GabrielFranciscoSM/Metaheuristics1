@@ -16,6 +16,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/main.dir/src/P2/AGE.cpp.o.d"
   "CMakeFiles/main.dir/src/P2/AGG.cpp.o"
   "CMakeFiles/main.dir/src/P2/AGG.cpp.o.d"
+  "CMakeFiles/main.dir/src/P2/AM.cpp.o"
+  "CMakeFiles/main.dir/src/P2/AM.cpp.o.d"
   "CMakeFiles/main.dir/src/P2/cross_ordered.cpp.o"
   "CMakeFiles/main.dir/src/P2/cross_ordered.cpp.o.d"
   "CMakeFiles/main.dir/src/P2/cross_unordered.cpp.o"

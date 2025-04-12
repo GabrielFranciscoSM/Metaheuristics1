@@ -35,4 +35,6 @@ public:
   void set_fitness(int i, tFitness fit);
 
   void print_pop();
+
+  vector<int> getSortedIndex();
 };

@@ -9,6 +9,7 @@ class CrossUnordered : public virtual Crossop{
 
     const int MIN_LENGTH = 2;
     std::uniform_int_distribution<int> dist_SizeSol;
+    std::uniform_int_distribution<int> dist_range; 
 
     public:
     CrossUnordered(Problem * prob);

@@ -15,7 +15,7 @@ private:
     
 public:
 
-    AGE(cross_operators _crossOp, Problem * Problem);
+    AGE(cross_operators _crossOp, Problem * problem);
     virtual ~AGE() = default;
 
     ResultMH optimize(Problem *problem, int maxevals) override;

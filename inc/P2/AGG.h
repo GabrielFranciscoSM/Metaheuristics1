@@ -3,7 +3,7 @@
 
 class AGG : virtual public AG{
 
-private:
+protected:
 
     int nMutate;
     int nCross;
@@ -14,7 +14,7 @@ private:
     
 public:
 
-    AGG(cross_operators _crossOp, Problem * Problem);
+    AGG(cross_operators _crossOp, Problem * problem);
     virtual ~AGG() = default;
 
     ResultMH optimize(Problem *problem, int maxevals) override;

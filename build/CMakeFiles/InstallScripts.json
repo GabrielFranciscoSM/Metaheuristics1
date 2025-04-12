@@ -1,7 +1,7 @@
 {
 	"InstallScripts" : 
 	[
-		"/home/gabriel/clase/MH/P1/build/cmake_install.cmake"
+		"/home/gabriel/clase/MH/Production/P1/build/cmake_install.cmake"
 	],
 	"Parallel" : false
 }

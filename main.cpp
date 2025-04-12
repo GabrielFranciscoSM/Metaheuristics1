@@ -27,6 +27,7 @@
 
 #include "AGE.h"
 #include "AG.h"
+#include "AM.h"
 
 using namespace std;
 
@@ -241,14 +242,21 @@ int main(int argc, char *argv[]) {
   }
 */
 
-    AGG ag(AG::cross_operators::unordered,problem);
+    //    Fase, Percentage of pop,  ordered,  evals per LS, crossover,                    problem
+    AM am(10,   1,                  true,     20,           AG::cross_operators::ordered, problem);
 
-    cout << endl << ag.optimize(problem,1000).fitness;
+    cout << endl << "am: " << am.optimize(problem,1000).fitness;
+    //AGE ageu(AG::cross_operators::unordered,problem);
 
-    //AGE age(AG::cross_operators::unordered,problem);
+    //cout << endl << "age unord: " << ageu.optimize(problem,1000).fitness;
 
-    //cout << endl << age.optimize(problem,1000).fitness;
+    //AM ago(AG::cross_operators::ordered,problem);
 
+    //cout << endl << "agg ord: " << ago.optimize(problem,1000).fitness;
+
+    //AGE ageo(AG::cross_operators::ordered,problem);
+
+    //cout << endl << "age ord: " << ageo.optimize(problem,1000).fitness;
   }
 
   return 0;

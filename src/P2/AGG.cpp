@@ -15,39 +15,52 @@ AGG::AGG(cross_operators _crossOp, Problem * problem) :
 }
 
 ResultMH AGG::optimize(Problem *problem, int maxevals){
-    int bestSolI = 0;
+    tFitness bestSolI = 0;
     float bestFit = 0;
     tSolution bestSol;
     
     while(this->evaluations < maxevals){
-        cerr << "EVALUATIONS: " << evaluations << ", Working pop: " << workingPop <<  endl;
-        cerr << "OLD POP: " << endl;
-        this->getWorkingPopulation().print_pop();
+        //cerr << "EVALUATIONS: " << evaluations << ", Working pop: " << workingPop <<  endl;
+        //cerr << "OLD POP: " << endl;
+        //this->getWorkingPopulation().print_pop();
 
         this->select();
-        cerr << "SELECT POP: " << endl;
-        this->getWorkingPopulation().print_pop();
-        
+        //cerr << "SELECT POP: " << endl;
+        //this->getWorkingPopulation().print_pop();
         this->cross(problem);
-        cerr << "CROSS POP: " << this->nCross << endl;
-        this->getWorkingPopulation().print_pop();
+        //cerr << "CROSS POP: " << this->nCross << endl;
+        //this->getWorkingPopulation().print_pop();
 
         this->mutate(problem);
-        cerr << "MUTATE POP: " << this->nMutate << endl;
-        this->getWorkingPopulation().print_pop();
+        //cerr << "MUTATE POP: " << this->nMutate << endl;
+        //this->getWorkingPopulation().print_pop();
+
+        int auxWorstFitness = bestFit;
+        int auxWorstIt = 0;
+        bool downgraded = true;
+
+        for(int i = 0; i < POP_SIZE; ++i){
+            if(this->getWorkingPopulation().getFitness(i) >= bestFit){
+                downgraded = false;
+                bestFit = this->getWorkingPopulation().getFitness(i);
+                bestSol = this->getWorkingPopulation().getSolution(i);
+            }
+
+            if(this->getWorkingPopulation().getFitness(i) <= auxWorstFitness){
+                auxWorstFitness = this->getWorkingPopulation().getFitness(i);
+                auxWorstIt = i;
+            }
+        }
+
+        if(downgraded){
+            this->getWorkingPopulation().insert_sol(auxWorstIt,bestSol,bestFit);
+        }
 
 
         workingPop = (workingPop+1)%2;
     }
 
-    for(int i = 0; i < POP_SIZE; ++i){
-        if(this->getPopulation((workingPop+1)%2).getFitness(i) > bestFit){
-            bestFit = this->getPopulation((workingPop+1)%2).getFitness(i);
-            bestSolI = i;
-        }
-    }
-
-    return ResultMH(bestSol,bestFit,10);
+    return ResultMH(bestSol,bestFit,this->evaluations);
 }
 
 
@@ -63,13 +76,16 @@ void AGG::select(){
 
 void AGG::cross(Problem * problem){
     for(int i = 0; i < nCross; i += 2){
+        
         crosOp->cross(
             this->getWorkingPopulation().getSolution(i), 
             this->getWorkingPopulation().getSolution(i + 1),
             problem
         );
+        
         this->updateFitness(i,problem);
         this->updateFitness(i+1,problem);
+        
     }
 }
 

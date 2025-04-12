@@ -15,9 +15,14 @@ using namespace std;
  */
 ResultMH LocalSearchLl::optimize(Problem *problem, int maxevals)
 {
+  tSolution initialSolution = problem->createSolution();
+  return optimizeSolution(initialSolution, problem, maxevals);
+}
+
+ResultMH LocalSearchLl::optimizeSolution(tSolution & Sol, Problem * problem, int maxevals){
   assert(maxevals > 0);
 
-  tSolution best = problem->createSolution();
+  tSolution best = Sol;
   float best_fitness = problem->fitness(best);
 
   // We pick a random node, checking that it isn't in the solution
@@ -25,7 +30,7 @@ ResultMH LocalSearchLl::optimize(Problem *problem, int maxevals)
                                     problem->getSolutionDomainRange().second-1);
   uniform_int_distribution<int> distSol(0, (int)(problem->getSolutionSize() - 1));
 
-  for (int i = 0; i < 10000; i++)
+  for (int i = 0; i < maxevals-1; i++)
   {
 
     int newNode = Random::get(distRang);

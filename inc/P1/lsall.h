@@ -27,4 +27,5 @@ public:
    * @return A pair containing the best solution found and its fitness
    */
   ResultMH optimize(Problem *problem, int maxevals) override;
+  ResultMH optimizeSolution(tSolution & Sol, Problem * problem, int maxevals);
 };
