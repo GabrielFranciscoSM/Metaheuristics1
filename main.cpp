@@ -36,19 +36,42 @@ void printUsage(const char* progName) {
   std::cerr << "Usage: " << progName << " [options]\n\n"
             << "Options:\n"
             << "  -f <file_spec>   Specify file number (0, 1, 2, 3) or 4 for all. Default: 0\n"
-            << "  -a <algo_spec>   Specify algorithm (random, local, local_optimized, greedy) or 'all'. Default: random\n"
-            << "  -t <output_spec> Specify output mode (terminal, document, both). Default: terminal\n"
-            << "  -h, --help       Show this help message\n\n"
-            << "Example:\n"
-            << "  " << progName << " -f 1 -a greedy -o both\n";
+            << "  -a <algo_spec>   Specify algorithm (AGG,AGE,AM) or 'all'. Default: random \n"
+            << "  -o <cross_op>    Specify cross operator (ordered,unordered) or 'all'. Default: all \n"
+            << "  -t               Enable terminal output                                   \n"
+            << "  -s <seed file>   Set the problem seeds to the one given in the seed file. \n"
+            << "  -h, --help       Show this help message                                 \n\n"
+            << "Example:                                                                    \n"
+            << "  " << progName << " -f 1 -a AGG                                            \n";
+}
+
+void usualPrint(std::ostream &out, string name, tSolution bestSol, tFitness bestFitness, float meanFit, std::chrono::duration<double> meanTime, float meanEvals ){
+  out << name << endl;
+  out << "Best solution:    " << bestSol << endl;
+  out << "Best fitness:     " << bestFitness << endl;
+  out << "Mean fitness:     " << meanFit/5.0 << endl;
+  out << "Computation time: " << meanTime.count()/5.0 << " seconds" << endl;
+  out << "Evaluations:      " << meanEvals/5.0 << endl << endl;
+}
+
+void tablePrint(std::ostream &out, string name, tFitness bestFitness, float meanFit, std::chrono::duration<double> meanTime, float meanEvals ){
+  out << 
+  name << "," << 
+  bestFitness << "," << 
+  meanFit/5.0 << "," << 
+  meanTime.count()/5.0 << "," <<
+  meanEvals/5.0 << endl; 
 }
 
 int main(int argc, char *argv[]) {
   
   long int seed = 42;
   int nfile = 0;
-  std::string algoSpec = "random";
+  std::string algoSpec = "all";
   std::string outputMode = "";
+
+  std::string seedsFile = "../datos/seeds.txt";
+  std::string cross_op = "ordered";
 
   //Parameter input processing
   for (int i = 1; i < argc; ++i) {
@@ -65,6 +88,14 @@ int main(int argc, char *argv[]) {
         if (i + 1 < argc) {
             algoSpec = argv[++i];
         }
+    } else if (arg == "-s") {
+        if (i + 1 < argc) {
+            seedsFile = argv[++i];
+        }
+    } else if (arg == "-o") {
+        if (i + 1 < argc) {
+          cross_op = argv[++i];
+        }        
     } else if (arg == "-t") {
         outputMode = "terminal";
     } else {
@@ -72,7 +103,7 @@ int main(int argc, char *argv[]) {
         printUsage(argv[0]);
         return 1; 
     }
-  }
+}
 
   //files for study
   string files[] = {
@@ -83,15 +114,27 @@ int main(int argc, char *argv[]) {
   };
 
   //Prefixed seeds for deterministic results
-  int seeds[] = {452987,34655,32346789,2854,2359834};
 
-  //Algorithms
-  RandomSearch ralg = RandomSearch();
-  LocalSearchLl lsall = LocalSearchLl();
-  LocalSearchEarlyStop blsmall = LocalSearchEarlyStop();
-  GreedySearch rgreedy = GreedySearch();
-  
-  Random::seed(seed); 
+  //Prefixed seeds for deterministic results
+  std::vector<int> seeds;
+  std::ifstream file(seedsFile);
+
+  if (!file.is_open()) {
+      std::cerr << "Error: Unable to open file " << seedsFile << std::endl;
+      return 1; // Return empty vector on error
+  }
+
+  int num;
+  while (file >> num) {
+      seeds.push_back(num);
+  }
+
+  file.close();
+
+  if(seeds.size() != 5){
+    std::cerr << "Error: Wrong number of seeds given. There are "  << seeds.size() << "seeds but has to be 5" << std::endl;
+    return 1;
+  }
 
   //File choosing logic
   int from_file;
@@ -103,6 +146,12 @@ int main(int argc, char *argv[]) {
   else  
     from_file=nfile;
 
+
+    int LSfase = 10;
+    float LSpercentage = 1;
+    bool orderPob = true;
+    int LSmaxEvals = 20; 
+
   //Procesing of algorithms for each files
   for(int f = from_file; f <= to_file; ++f){
     
@@ -110,38 +159,54 @@ int main(int argc, char *argv[]) {
     //Inizialize problem for ythe given file 
     ProblemInflu pi = ProblemInflu(10,file);
 
+    Problem *problem = dynamic_cast<Problem *>(&pi);
+
+    AGG agg_o(AG::cross_operators::ordered,problem);
+    AGE age_o(AG::cross_operators::ordered,problem);
+    AM  am_o(LSfase,LSpercentage,orderPob,LSmaxEvals,AG::cross_operators::ordered,problem);
+    AGG agg_u(AG::cross_operators::unordered,problem);
+    AGE age_u(AG::cross_operators::unordered,problem);
+    AM  am_u(LSfase,LSpercentage,orderPob,LSmaxEvals,AG::cross_operators::unordered,problem);
+  
     //Logic for algorithms choosing
     vector<pair<string, MH *>> algoritmos;
-    if(algoSpec == "random"){
-      algoritmos.push_back(make_pair("RandomSearch", &ralg));
-    }else if(algoSpec == "local"){
-      algoritmos.push_back(make_pair("LocalSearchLl",&lsall));
-    }else if(algoSpec == "localsmall"){
-      algoritmos.push_back(make_pair("LocalSearchEarlyStop",&blsmall));
-    }else if(algoSpec == "greedy"){
-      algoritmos.push_back(make_pair("Greedy",&rgreedy));
+    if(algoSpec == "AGG"){
+      if(cross_op == "ordered" || cross_op == "all")
+        algoritmos.push_back(make_pair("Genetic generational ordered", &agg_o));
+      if(cross_op == "unordered" || cross_op == "all")
+        algoritmos.push_back(make_pair("Genetic generational unordered", &agg_u));
+    }else if(algoSpec == "AGE"){
+      if(cross_op == "ordered" || cross_op == "all")
+        algoritmos.push_back(make_pair("Genetic stationary ordered",&age_o));
+      if(cross_op == "unordered" || cross_op == "all")
+        algoritmos.push_back(make_pair("Genetic stationary unordered",&age_u));
+    }else if(algoSpec == "AM"){
+      if(cross_op == "ordered" || cross_op == "all")
+        algoritmos.push_back(make_pair("Memetic ordered",&am_o));
+      if(cross_op == "ordered" || cross_op == "all")
+        algoritmos.push_back(make_pair("Memetic unoredered",&am_u));
     }else{
-      algoritmos.push_back(make_pair("RandomSearch", &ralg));
-      algoritmos.push_back(make_pair("LocalSearchLl",&lsall));
-      algoritmos.push_back(make_pair("LocalSearchEarlyStop",&blsmall));
-      algoritmos.push_back(make_pair("Greedy",&rgreedy));
-    }
+      if(cross_op == "ordered" || cross_op == "all"){
+        algoritmos.push_back(make_pair("Genetic generational ordered", &agg_o));
+        algoritmos.push_back(make_pair("Genetic stationary ordered",&age_o));
+        algoritmos.push_back(make_pair("Memetic ordered",&am_o));
+      }
 
-    Problem *problem = dynamic_cast<Problem *>(&pi);
+      if(cross_op == "ordered" || cross_op == "all"){
+        algoritmos.push_back(make_pair("Genetic generational unordered", &agg_u));
+        algoritmos.push_back(make_pair("Genetic stationary unordered",&age_u));
+        algoritmos.push_back(make_pair("Memetic unoredered",&am_u));
+      }
+    }
     
     //Output for the file
     string output = "../datos/output_";
     output.append(files[f].substr(9));
     ofstream out(output);
+    out << "name,bestFitness,meanFit,meanTime,meanEvals" << endl;
 
-
-    /*
-    
     //Compute algorithm
     for (int i = 0; i < algoritmos.size(); i++) {    
-
-      std::cout << algoritmos[i].first << endl;
-
       //Select algorithm
       MH *mh = algoritmos[i].second;
       
@@ -162,7 +227,7 @@ int main(int argc, char *argv[]) {
         ResultMH res(mh->optimize(problem, 1000));
         auto fin = std::chrono::system_clock::now();
         meanTime += fin - inicio;
-    
+
         meanFit += res.fitness;
         meanEvals += res.evaluations;
 
@@ -172,91 +237,14 @@ int main(int argc, char *argv[]) {
         }
       }
 
-      //File output
-      out << algoritmos[i].first << endl;
-      out << "Best solution:    " << bestSol << endl;
-      out << "Best fitness:     " << bestFitness << endl;
-      out << "Mean fitness:     " << (float)meanFit/5.0 << endl;
-      out << "Computation time: " << meanTime.count()/5.0 << " seconds" << endl;
-      out << "Evaluations:      " << (float)meanEvals/5.0 << endl;
-
+      //usualPrint(out,algoritmos[i].first,bestSol,bestFitness,(float)meanFit,meanTime,(float)meanEvals);
+      tablePrint(out,algoritmos[i].first,bestFitness,(float)meanFit,meanTime,(float)meanEvals);
       //Terminal output
       if(outputMode == "terminal"){
-        std::cout << "File:             " << files[f].substr(9) << endl;
-        std::cout << "Best solution:    " << bestSol << endl;
-        std::cout << "Best fitness:     " << bestFitness << endl;
-        std::cout << "Mean fitness:     " << (float)meanFit/5.0 << endl;
-        std::cout << "Computation time: " << meanTime.count()/5.0 << " seconds" << endl;
-        std::cout << "Evaluations:      " << (float)meanEvals/5.0 << endl << endl;  
+        usualPrint(std::cout,algoritmos[i].first,bestSol,bestFitness,(float)meanFit,meanTime,(float)meanEvals);
       }
     }
 
-    */
-/*
-    Population pop(10);
-
-    for(int i = 0; i < 10; ++i){
-      tSolution sol = pi.createSolution();
-      pop.push_back_sol(sol,pi.fitness(sol));
-    }
-
-    uniform_int_distribution<int> dist_int(0, pop.getPopulationSize() - 1);
-    SelectOp sel;
-    for(int i = 0; i < 10; ++i){
-      std::cout << sel.select(pop) << endl;
-    }
-*/
-/*
-    tSolution sol1 = pi.createSolution();
-    tSolution sol2 = pi.createSolution();
-
-    cout << sol1 << " " << sol2 << endl;
-
-    CrossUnordered cross;
-    CrossOrdered ordCross;
-
-    ordCross.cross(sol1,sol2);
-
-    cout << sol1 << " " << sol2 << endl;
-
-        AG ag(cross_operators::unordered,problem);
-
-    cout << "POP0 inic" << endl;
-    for(int i = 0; i < ag.getPopulation(0).getPopulationSize(); ++i){
-      cout << ag.getPopulation(0).getSolution(i) << endl;
-    }
-    ag.select_population();
-
-    cout << "POP1 cross" << endl;
-    for(int i = 0; i < ag.getPopulation(1).getPopulationSize(); ++i){
-      cout << ag.getPopulation(1).getSolution(i) << endl;
-    }
-    cout << endl;
-    ag.cross_population(problem);
-
-    cout << "POP1 cross" << endl;
-
-    for(int i = 0; i < ag.getPopulation(1).getPopulationSize(); ++i){
-      cout << ag.getPopulation(1).getSolution(i) << endl;
-    }
-  }
-*/
-
-    //    Fase, Percentage of pop,  ordered,  evals per LS, crossover,                    problem
-    AM am(10,   1,                  true,     20,           AG::cross_operators::ordered, problem);
-
-    cout << endl << "am: " << am.optimize(problem,1000).fitness;
-    //AGE ageu(AG::cross_operators::unordered,problem);
-
-    //cout << endl << "age unord: " << ageu.optimize(problem,1000).fitness;
-
-    //AM ago(AG::cross_operators::ordered,problem);
-
-    //cout << endl << "agg ord: " << ago.optimize(problem,1000).fitness;
-
-    //AGE ageo(AG::cross_operators::ordered,problem);
-
-    //cout << endl << "age ord: " << ageo.optimize(problem,1000).fitness;
   }
 
   return 0;

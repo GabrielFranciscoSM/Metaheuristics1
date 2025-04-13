@@ -8,32 +8,22 @@ AGG::AGG(cross_operators _crossOp, Problem * problem) :
 
     nMutate = ceil(MUTATE_PROB*POP_SIZE);
     nCross = ceil(CROSS_PROB*POP_SIZE/2) * 2;
-
-    workingPop = 1;
-    this->generatePopulation(problem,this->population[0]);
-
 }
 
 ResultMH AGG::optimize(Problem *problem, int maxevals){
+    this->generatePopulation(problem,this->population[0]);
+    workingPop = 1;
+
     tFitness bestSolI = 0;
     float bestFit = 0;
     tSolution bestSol;
+
+    evaluations = 0;
     
-    while(this->evaluations < maxevals){
-        //cerr << "EVALUATIONS: " << evaluations << ", Working pop: " << workingPop <<  endl;
-        //cerr << "OLD POP: " << endl;
-        //this->getWorkingPopulation().print_pop();
-
+    while(evaluations < maxevals){
         this->select();
-        //cerr << "SELECT POP: " << endl;
-        //this->getWorkingPopulation().print_pop();
         this->cross(problem);
-        //cerr << "CROSS POP: " << this->nCross << endl;
-        //this->getWorkingPopulation().print_pop();
-
         this->mutate(problem);
-        //cerr << "MUTATE POP: " << this->nMutate << endl;
-        //this->getWorkingPopulation().print_pop();
 
         int auxWorstFitness = bestFit;
         int auxWorstIt = 0;
@@ -60,7 +50,7 @@ ResultMH AGG::optimize(Problem *problem, int maxevals){
         workingPop = (workingPop+1)%2;
     }
 
-    return ResultMH(bestSol,bestFit,this->evaluations);
+    return ResultMH(bestSol,bestFit,evaluations);
 }
 
 

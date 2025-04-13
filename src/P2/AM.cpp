@@ -14,29 +14,26 @@ LSmaxEvals(LSmaxEvals){
 }
 
 ResultMH AM::optimize(Problem *problem, int maxevals){
+
+    this->generatePopulation(problem,this->population[0]);
+    workingPop = 1;
+
     tFitness bestSolI = 0;
     float bestFit = 0;
     tSolution bestSol;
-    int generations = 0;
-    while(this->evaluations < maxevals){
-        //cerr << "EVALUATIONS: " << evaluations << ", Working pop: " << workingPop <<  endl;
-        //cerr << "OLD POP: " << endl;
-        //this->getWorkingPopulation().print_pop();
+    int generations = 0;    
 
+    evaluations = 0;
+
+    while(evaluations < maxevals){
+        
         this->select();
-        //cerr << "SELECT POP: " << endl;
-        //this->getWorkingPopulation().print_pop();
-        this->cross(problem);
-        //cerr << "CROSS POP: " << this->nCross << endl;
-        //this->getWorkingPopulation().print_pop();
 
+        this->cross(problem);
         this->mutate(problem);
-        //cerr << "MUTATE POP: " << this->nMutate << endl;
-        //this->getWorkingPopulation().print_pop();
 
         generations++;
         if(generations%LSfase == 0){
-
             evaluations = applyLocalSearch(problem, evaluations, maxevals);
         }
 
@@ -64,7 +61,7 @@ ResultMH AM::optimize(Problem *problem, int maxevals){
         workingPop = (workingPop+1)%2;
     }
 
-    return ResultMH(bestSol,bestFit,this->evaluations);
+    return ResultMH(bestSol,bestFit,evaluations);
 }
 
 int AM::applyLocalSearch(Problem *problem, int evaluations, int maxEvals){

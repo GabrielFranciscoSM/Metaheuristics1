@@ -17,6 +17,9 @@ public:
     AGG(cross_operators _crossOp, Problem * problem);
     virtual ~AGG() = default;
 
+    void setCrossOp(cross_operators _crossOp);
+
+
     ResultMH optimize(Problem *problem, int maxevals) override;
 
 //private:

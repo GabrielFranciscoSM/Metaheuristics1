@@ -28,21 +28,13 @@ AGE::AGE(cross_operators _crossOp, Problem * problem) :
 
 ResultMH AGE::optimize(Problem *problem, int maxevals){
     
-    while(this->evaluations < maxevals){
-        //cerr << "EVALUATIONS: " << evaluations <<  endl;
-        //cerr << "OLD POP: " << endl;
-        //this->population.print_pop();
+    evaluations = 0;
 
-        this->select();
-        //cerr << "SELECT POP: " << endl;
-        //this->population.print_pop();
-        
+    while(evaluations < maxevals){
+
+        this->select();        
         this->cross(problem);
-        //this->population.print_pop();
-
         this->mutate(problem);
-        //cerr << "MUTATE POP: " << endl;
-        //this->population.print_pop();
 
         tFitness fit1 = this->getFitness(problem, sols.first);
         tFitness fit2 = this->getFitness(problem, sols.second);
@@ -62,7 +54,7 @@ ResultMH AGE::optimize(Problem *problem, int maxevals){
         }
     }
 
-    return ResultMH(this->population.getSolution(bestSol),this->population.getFitness(bestSol),10);
+    return ResultMH(this->population.getSolution(bestSol),this->population.getFitness(bestSol),evaluations);
 }
 
 void AGE::select(){
