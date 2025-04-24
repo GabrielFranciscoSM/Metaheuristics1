@@ -24,7 +24,7 @@ public:
 
   tSolution & getSolution(int i){return population.at(i);}
 
-  bool findSolution(tSolution sol);
+  bool findSolution(tSolution & sol);
 
   /*------------OPERATORS------------*/
 

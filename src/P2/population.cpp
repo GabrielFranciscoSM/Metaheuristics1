@@ -31,7 +31,7 @@ void Population::print_pop(){
     }
 }
 
-bool Population::findSolution(tSolution sol){
+bool Population::findSolution(tSolution & sol){
     return (find(this->population.begin(),this->population.end(),sol) == this->population.end());
 }
 

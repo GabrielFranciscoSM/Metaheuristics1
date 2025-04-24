@@ -1,7 +1,2 @@
 name,bestFitness,meanFit,meanTime,meanEvals
-Genetic generational ordered,11.9,11.54,4.93522,1000
-Genetic stationary ordered,11.1,11.1,5.02364,1000
-Memetic ordered,11.9,11.68,5.21661,1000
-Genetic generational unordered,11.9,11.54,5.43027,1000
-Genetic stationary unordered,10.9,10.82,5.52348,1000
-Memetic unoredered,11.9,11.72,5.71143,1000
+Genetic generational ordered,11.9,11.54,1.51082,1000

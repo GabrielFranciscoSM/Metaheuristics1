@@ -32,11 +32,14 @@ ResultMH AM::optimize(Problem *problem, int maxevals){
         this->cross(problem);
         this->mutate(problem);
 
+        //Busqueda local
         generations++;
         if(generations%LSfase == 0){
             evaluations = applyLocalSearch(problem, evaluations, maxevals);
         }
 
+
+        //Elitismo
         int auxWorstFitness = bestFit;
         int auxWorstIt = 0;
         bool downgraded = true;
@@ -58,6 +61,7 @@ ResultMH AM::optimize(Problem *problem, int maxevals){
             this->getWorkingPopulation().insert_sol(auxWorstIt,bestSol,bestFit);
         }
 
+        //Cambiamos de poblacion
         workingPop = (workingPop+1)%2;
     }
 

@@ -6,22 +6,32 @@ import math
 #-------------------------------------------------
 # Configuration
 #-------------------------------------------------
-# Directory where your result CSV files are located
-RESULTS_DIR = './' # Current directory/results subdir
-# Pattern to match result files
-FILE_PATTERN = 'output*.txt'
+RESULTS_DIR = './' # Directory containing CSV files
+FILE_PATTERN = 'output*.txt'    # Pattern to match files
+
+# --- !!! --- Filter Criteria (Set these to filter) --- !!! ---
+# Set to a specific name (e.g., 'AlgoA_Prob1') to filter by name, or None to disable.
+FILTER_BY_NAME = None # Example: 'AlgoA_Prob1'
+
+# Set to a specific run_id (filename without extension, e.g., 'algoA_config1')
+# to filter by file, or None to disable.
+# NOTE: Only one filter (name or run_id) will be actively used in the example
+#       generation below, but you can generate multiple tables.
+FILTER_BY_RUN_ID = None # Example: 'algoA_config1'
+# --- !!! --- End Filter Criteria --- !!! ---
+
 
 #-------------------------------------------------
-# Helper function for number formatting (same as before)
+# Helper function for number formatting (MODIFIED from previous version)
 #-------------------------------------------------
 def format_num(num, precision=2, sci_thresh_low=1e-3, sci_thresh_high=1e4):
-    """Formats numbers for the table."""
-    if num is None: return 'N/A' # Handle potential missing data
+    """Formats numbers for the table. Handles None."""
+    if num is None:
+        return 'N/A' # Or '-' or empty string
     try:
-        num = float(num) # Ensure it's numeric
+        num = float(num)
     except (ValueError, TypeError):
-        return str(num) # Return as string if not convertible
-
+        return str(num)
     if num == 0:
         return f"{0:.{precision}f}"
     abs_num = abs(num)
@@ -31,34 +41,50 @@ def format_num(num, precision=2, sci_thresh_low=1e-3, sci_thresh_high=1e4):
         return f"{num:.{precision}f}"
 
 #-------------------------------------------------
-# Function to read data from a single CSV file
+# Function to read data from a single CSV file (MODIFIED from previous version)
 #-------------------------------------------------
 def read_data_from_file(filepath):
-    """Reads structured data from a CSV file."""
+    """
+    Reads structured data from a CSV file, handling potential
+    missing values or conversion errors more robustly.
+    """
     data = []
     try:
         with open(filepath, 'r', newline='') as csvfile:
             reader = csv.DictReader(csvfile)
             expected_headers = ['name', 'bestFitness', 'meanFit', 'meanTime', 'meanEvals']
+            if not reader.fieldnames:
+                 # print(f"Warning: File '{filepath}' appears to be empty or has no header. Skipping.")
+                 return []
             if not all(h in reader.fieldnames for h in expected_headers):
                  print(f"Warning: File '{filepath}' has missing headers. Expected: {expected_headers}. Found: {reader.fieldnames}. Skipping file.")
                  return []
 
+            line_num = 1
             for row in reader:
-                try:
-                    # Convert numeric types
-                    row_data = {
-                        'name': row.get('name', 'Unknown'), # Use .get for safety
-                        'bestFitness': float(row['bestFitness']),
-                        'meanFit': float(row['meanFit']),
-                        'meanTime': float(row['meanTime']),
-                        'meanEvals': int(float(row['meanEvals'])), # Evals usually integer
-                        # Add other fields if they exist, handle potential errors
-                    }
-                    data.append(row_data)
-                except (ValueError, KeyError) as e:
-                    print(f"Warning: Skipping row in '{filepath}' due to data error: {e}. Row: {row}")
-                    continue # Skip malformed rows
+                line_num += 1
+                row_data = {}
+                row_data['name'] = row.get('name', f'Unknown_L{line_num}')
+
+                for key, converter in [('bestFitness', float), ('meanFit', float),
+                                       ('meanTime', float), ('meanEvals', float)]:
+                    raw_value = row.get(key)
+                    if raw_value is None or raw_value.strip() == '':
+                        row_data[key] = None
+                    else:
+                        try:
+                            row_data[key] = converter(raw_value)
+                        except (ValueError, TypeError):
+                            print(f"Warning: Invalid value '{raw_value}' for '{key}' in '{filepath}' line {line_num}. Setting to None.")
+                            row_data[key] = None
+
+                if row_data.get('meanEvals') is not None:
+                    try:
+                        row_data['meanEvals'] = int(row_data['meanEvals'])
+                    except (ValueError, TypeError):
+                        pass # Keep as float if int conversion fails
+
+                data.append(row_data)
     except FileNotFoundError:
         print(f"Error: File not found: {filepath}")
         return []
@@ -68,120 +94,90 @@ def read_data_from_file(filepath):
     return data
 
 #-------------------------------------------------
-# Function to generate LaTeX table code (modified slightly)
+# Function to generate LaTeX table code (Mostly Unchanged)
 #-------------------------------------------------
 def generate_latex_table(data, caption="Performance Results", label="tab:results",
                          sort_by=None, reverse_sort=False,
                          columns=None, column_formats=None,
-                         precision=2, sci_thresh_low=1e-3, sci_thresh_high=1e4):
+                         precision=2, sci_thresh_low=1e-3, sci_thresh_high=1e4,
+                         add_resizebox=True): # Added option to disable resizebox
     """
     Generates LaTeX code for a table from the structured data.
-    Requires LaTeX packages: booktabs
+    Requires LaTeX packages: booktabs, graphicx (if resizebox used)
     """
     if not data:
-        return "% No data provided or read\n"
+        return f"% No data provided for table '{label}'\n"
 
-    # --- Default Columns ---
-    # If columns aren't specified, try to determine from data, including 'run_id'
+    # Determine default columns if not provided
     if columns is None:
         if data:
             columns = list(data[0].keys())
-            # Try to put 'run_id' and 'name' first if they exist
             default_order = ['run_id', 'name']
             remaining_cols = [c for c in columns if c not in default_order]
             columns = [c for c in default_order if c in columns] + sorted(remaining_cols)
         else:
-            columns = [] # No data, no columns
+            columns = []
 
-    # --- Sorting ---
+    # Sorting
     if sort_by:
         if sort_by not in columns:
-            print(f"Warning: Sort key '{sort_by}' not found in data keys. Sorting ignored.")
+            print(f"Warning: Sort key '{sort_by}' not found in data keys for table '{label}'. Sorting ignored.")
         else:
             try:
-                # Use .get with a default that won't break sorting (e.g., 0 or infinity)
                 default_sort_val = float('inf') if not reverse_sort else float('-inf')
-                data.sort(key=lambda x: x.get(sort_by, default_sort_val), reverse=reverse_sort)
+                # Make a copy to sort only for this table generation
+                data_to_sort = list(data)
+                data_to_sort.sort(key=lambda x: x.get(sort_by, default_sort_val), reverse=reverse_sort)
+                data = data_to_sort # Use the sorted copy
             except TypeError:
-                 print(f"Warning: Could not sort by '{sort_by}' due to incompatible data types. Sorting ignored.")
+                 print(f"Warning: Could not sort by '{sort_by}' for table '{label}' due to incompatible data types. Sorting ignored.")
 
-
-    # --- LaTeX Preamble & Table Structure ---
+    # Column Alignment
     col_align = []
     for col in columns:
-        # Basic heuristic: 'name' and 'run_id' left, others right
-        if col in ['name', 'run_id']:
-            col_align.append('l')
-        else:
-            col_align.append('r')
+        col_align.append('l' if col in ['name', 'run_id'] else 'r')
 
-    # Generate only the table environment, not the full document
-    # User should wrap this in \documentclass, \usepackage{booktabs}, \begin{document} etc.
+    # LaTeX Generation
     latex_str = f"% --- Generated LaTeX Table: {label} ---\n"
-    latex_str += "\\begin{table}[htbp] % Use 'H' from float package for 'exactly here'\n"
+    latex_str += "\\begin{table}[htbp]\n"
     latex_str += "  \\centering\n"
     latex_str += f"  \\caption{{{caption}}}\n"
     latex_str += f"  \\label{{{label}}}\n"
-    # Make table potentially smaller if many columns
-    latex_str += "  \\resizebox{\\textwidth}{!}{%\n" # Scale table to text width if needed
+    if add_resizebox:
+        latex_str += "  \\resizebox{\\textwidth}{!}{%\n" # Scale table
     latex_str += f"  \\begin{{tabular}}{{ {' '.join(col_align)} }}\n"
     latex_str += "    \\toprule\n"
 
-    # --- Header Row ---
-    header_names = { # Nicer names for headers
-        'run_id': 'Run ID',
-        'name': 'Name',
-        'bestFitness': 'Best Fitness',
-        'meanFit': 'Mean Fitness',
-        'meanTime': 'Mean Time (s)',
-        'meanEvals': 'Mean Evals'
-    }
+    # Headers
+    header_names = { 'run_id': 'Run ID', 'name': 'Name', 'bestFitness': 'Best Fitness',
+                     'meanFit': 'Mean Fitness', 'meanTime': 'Mean Time (s)', 'meanEvals': 'Mean Evals' }
     header = [f"\\textbf{{{header_names.get(col, col.replace('_', ' ').title())}}}" for col in columns]
     latex_str += "    " + " & ".join(header) + " \\\\\n"
     latex_str += "    \\midrule\n"
 
-    # --- Data Rows ---
+    # Data Rows
     for row_data in data:
         row_values = []
         for col in columns:
-            value = row_data.get(col, 'N/A') # Use .get for safety
-
-            # Apply custom format if specified
+            value = row_data.get(col, 'N/A')
             if column_formats and col in column_formats:
                  formatted_value = column_formats[col](value) if callable(column_formats[col]) else column_formats[col] % value
-            # Default formatting
             elif isinstance(value, (int, float)):
                 formatted_value = format_num(value, precision, sci_thresh_low, sci_thresh_high)
             elif isinstance(value, str):
-                 # Escape special LaTeX characters in strings
-                 formatted_value = value.replace('\\', '\\textbackslash{}') # Must be first
-                 formatted_value = formatted_value.replace('_', '\\_')
-                 formatted_value = formatted_value.replace('%', '\\%')
-                 formatted_value = formatted_value.replace('&', '\\&')
-                 formatted_value = formatted_value.replace('#', '\\#')
-                 formatted_value = formatted_value.replace('$', '\\$')
-                 formatted_value = formatted_value.replace('{', '\\{')
-                 formatted_value = formatted_value.replace('}', '\\}')
-                 formatted_value = formatted_value.replace('~', '\\textasciitilde{}')
-                 formatted_value = formatted_value.replace('^', '\\textasciicircum{}')
-
+                 formatted_value = value.replace('\\', '\\textbackslash{}').replace('_', '\\_').replace('%', '\\%').replace('&', '\\&').replace('#', '\\#').replace('$', '\\$').replace('{', '\\{').replace('}', '\\}').replace('~', '\\textasciitilde{}').replace('^', '\\textasciicircum{}')
             else:
-                formatted_value = str(value) # Fallback
-
+                formatted_value = str(value)
             row_values.append(formatted_value)
-
         latex_str += "    " + " & ".join(row_values) + " \\\\\n"
 
-    # --- Footer ---
+    # Footer
     latex_str += "    \\bottomrule\n"
     latex_str += "  \\end{tabular}%\n"
-    latex_str += "  } % End resizebox\n" # Add closing brace for resizebox
+    if add_resizebox:
+        latex_str += "  } % End resizebox\n"
     latex_str += "\\end{table}\n"
-    latex_str += "% --- End Generated Table ---\n"
-    # Note about missing std dev is still relevant
-    latex_str += "% Note: Mean values are averages over runs *within* the original experiment setup.\n"
-    latex_str += "% Standard deviations for these means were not available in the input files.\n"
-
+    latex_str += f"% --- End Generated Table {label} ---\n"
     return latex_str
 
 #-------------------------------------------------
@@ -195,88 +191,116 @@ if not file_list:
     print(f"No files found matching '{search_path}'")
 else:
     print(f"Found {len(file_list)} files to process:")
-    for filepath in sorted(file_list): # Sort files for consistent processing order
+    for filepath in sorted(file_list):
         print(f"  - Reading {filepath}")
-        # Extract a Run ID from the filename
         filename = os.path.basename(filepath)
-        run_id, _ = os.path.splitext(filename) # Get filename without extension
-        # You might want to clean up the run_id further, e.g., remove prefixes
-        # run_id = run_id.replace('results_', '').replace('_final', '')
+        run_id, _ = os.path.splitext(filename)
+        # Optional: Clean up run_id further if needed
+        # run_id = run_id.replace('results_', '').replace('_run', '')
 
         file_data = read_data_from_file(filepath)
-
-        # Add the run_id to each record from this file
         for record in file_data:
-            record['run_id'] = run_id # Add the identifier
-
+            record['run_id'] = run_id # Add the identifier derived from filename
         all_data.extend(file_data)
 
 print(f"\nTotal records processed: {len(all_data)}")
 
 #-------------------------------------------------
-# Generate LaTeX Output
+# Generate LaTeX Output - Combined and Filtered
 #-------------------------------------------------
+latex_all_tables_content = "" # Accumulate table code here
+
 if all_data:
-    # Example 1: Table sorted by Mean Fitness (descending) across all runs
-    latex_code_sorted_fitness = generate_latex_table(
-        all_data, # Use the combined data
-        caption="Combined Performance Results Sorted by Mean Fitness (Higher is Better)",
-        label="tab:combined_sorted_fit",
+    # --- 1. Generate Table for ALL Data (Example: Sorted by Mean Fitness) ---
+    latex_all_tables_content += generate_latex_table(
+        all_data,
+        caption="Combined Performance Results (All Runs)",
+        label="tab:combined_all",
         sort_by='meanFit',
         reverse_sort=True, # Higher fitness is better
         precision=3
     )
-    print("\n--- LaTeX Table: Combined Data Sorted by Mean Fitness ---")
-    print(latex_code_sorted_fitness)
+    latex_all_tables_content += "\n\\vspace{1em}\n" # Add some vertical space
 
-    # Example 2: Table sorted by Mean Time (ascending) across all runs
-    latex_code_sorted_time = generate_latex_table(
-        all_data, # Use the combined data
-        caption="Combined Performance Results Sorted by Mean Time (Lower is Better)",
-        label="tab:combined_sorted_time",
-        sort_by='meanTime',
-        reverse_sort=False, # Lower time is better
-        precision=1
-    )
-    # print("\n--- LaTeX Table: Combined Data Sorted by Mean Time ---")
-    # print(latex_code_sorted_time)
+    # --- 2. Generate Table Filtered by Specific 'name' (if specified) ---
+    if FILTER_BY_NAME:
+        print(f"\nFiltering data for name: '{FILTER_BY_NAME}'...")
+        filtered_data = [row for row in all_data if row.get('name') == FILTER_BY_NAME]
 
-    # Example 3: Table sorted by Run ID (alphabetical), then maybe Name
-    # To sort by multiple keys, sort the data beforehand
-    # all_data.sort(key=lambda x: (x.get('run_id', ''), x.get('name', '')))
-    # latex_code_sorted_runid = generate_latex_table(
-    #     all_data,
-    #     caption="Combined Performance Results Sorted by Run ID",
-    #     label="tab:combined_sorted_runid",
-    #     sort_by=None # Already sorted
-    # )
-    # print("\n--- LaTeX Table: Combined Data Sorted by Run ID ---")
-    # print(latex_code_sorted_runid)
+        if filtered_data:
+            print(f"Found {len(filtered_data)} records matching the name.")
+            # Define columns for this table (maybe exclude 'name' as it's constant)
+            name_filtered_cols = ['run_id', 'bestFitness', 'meanFit', 'meanTime', 'meanEvals']
+            # Sort by a relevant metric for comparison across runs, e.g., meanTime
+            latex_all_tables_content += generate_latex_table(
+                filtered_data,
+                caption=f"Performance Results for '{FILTER_BY_NAME}' Across Different Runs",
+                label=f"tab:filtered_name_{FILTER_BY_NAME.replace('_','').lower()}", # Basic label generation
+                columns=name_filtered_cols, # Use specific columns
+                sort_by='meanTime', # Example: sort by time
+                reverse_sort=False, # Lower time is better
+                precision=3,
+                add_resizebox=False # Table might be smaller, no need to resize
+            )
+            latex_all_tables_content += "\n\\vspace{1em}\n"
+        else:
+            print(f"No data found matching name '{FILTER_BY_NAME}'. Skipping name-filtered table.")
+
+    # --- 3. Generate Table Filtered by Specific 'run_id' (if specified) ---
+    #    (Useful for showing results from a single file)
+    if FILTER_BY_RUN_ID:
+        print(f"\nFiltering data for run_id: '{FILTER_BY_RUN_ID}'...")
+        filtered_data = [row for row in all_data if row.get('run_id') == FILTER_BY_RUN_ID]
+
+        if filtered_data:
+            print(f"Found {len(filtered_data)} records matching the run_id.")
+            # Define columns (maybe exclude 'run_id' as it's constant)
+            runid_filtered_cols = ['name', 'bestFitness', 'meanFit', 'meanTime', 'meanEvals']
+            # Sort by name within the file, for example
+            latex_all_tables_content += generate_latex_table(
+                filtered_data,
+                caption=f"Performance Results from Run '{FILTER_BY_RUN_ID}'",
+                label=f"tab:filtered_run_{FILTER_BY_RUN_ID.replace('_','').lower()}", # Basic label generation
+                columns=runid_filtered_cols, # Use specific columns
+                sort_by='name', # Sort alphabetically by name within the file
+                reverse_sort=False,
+                precision=3,
+                add_resizebox=True # Might still need resize if many rows/names
+            )
+            latex_all_tables_content += "\n\\vspace{1em}\n"
+        else:
+            print(f"No data found matching run_id '{FILTER_BY_RUN_ID}'. Check RESULTS_DIR and filenames. Skipping run_id-filtered table.")
 
     # --- Saving to a file ---
-    # You would typically generate one or more tables and save them.
-    output_filename = "combined_results_table.tex"
-    try:
-        with open(output_filename, "w") as f:
-            # Add necessary LaTeX document preamble IF this is the ONLY content
-            # If inserting into an existing document, just write the table code.
-            f.write("\\documentclass{article}\n")
-            f.write("\\usepackage{booktabs} % For nice table rules\n")
-            f.write("\\usepackage{graphicx} % For resizebox\n")
-            f.write("\\usepackage[margin=1in]{geometry} % Adjust margins if needed\n")
-            f.write("\\usepackage{amsmath}\n\n")
-            f.write("\\begin{document}\n\n")
+    if latex_all_tables_content:
+        output_filename = "generated_tables.tex"
+        try:
+            with open(output_filename, "w") as f:
+                # Add necessary LaTeX document preamble
+                f.write("\\documentclass{article}\n")
+                f.write("\\usepackage{booktabs} % For nice table rules\n")
+                f.write("\\usepackage{graphicx} % For resizebox\n")
+                f.write("\\usepackage[margin=1in]{geometry} % Adjust margins\n")
+                f.write("\\usepackage{amsmath}\n")
+                f.write("\\usepackage{lmodern} % Use Latin Modern font\n") # Often looks better
+                f.write("\\usepackage[T1]{fontenc}\n")
+                f.write("\\usepackage{textcomp} % For symbols like textasciitilde\n\n") # Important for escaped chars
+                f.write("\\begin{document}\n\n")
 
-            # Write the desired table(s)
-            f.write(latex_code_sorted_fitness)
-            # f.write("\n\\newpage\n\n") # Optional page break between tables
-            # f.write(latex_code_sorted_time)
+                # Write all generated table code
+                f.write(latex_all_tables_content)
 
-            f.write("\n\\end{document}\n")
-        print(f"\nLaTeX code saved to '{output_filename}'")
-        print(f"Compile using: pdflatex {output_filename}")
-    except IOError as e:
-        print(f"\nError writing LaTeX output to file: {e}")
+                # Add the note about standard deviations once at the end
+                f.write("\n\\bigskip\n") # More space before the note
+                f.write("\\textit{Note: Mean values are averages over runs performed within the original experiment setup that generated the input CSV files. Standard deviations for these means were not available in the input files.}\n\n")
+
+                f.write("\\end{document}\n")
+            print(f"\nLaTeX code for selected tables saved to '{output_filename}'")
+            print(f"Compile using: pdflatex {output_filename}")
+        except IOError as e:
+            print(f"\nError writing LaTeX output to file: {e}")
+    else:
+        print("\nNo tables were generated (perhaps no data or no filters matched).")
 
 else:
     print("\nNo data loaded, skipping LaTeX table generation.")

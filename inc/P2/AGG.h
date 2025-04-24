@@ -20,7 +20,7 @@ public:
     void setCrossOp(cross_operators _crossOp);
 
 
-    ResultMH optimize(Problem *problem, int maxevals) override;
+    virtual ResultMH optimize(Problem *problem, int maxevals) override;
 
 //private:
     Population & getPopulation(int i);

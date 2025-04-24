@@ -55,24 +55,26 @@ ResultMH AGG::optimize(Problem *problem, int maxevals){
 
 
 void AGG::select(){
-    pair<tSolution,tFitness> sol_fit;
+    pair<tSolution,tFitness> sol;
 
     for(int i = 0; i < POP_SIZE; ++i){
-        sol_fit = selectOp.select(this->getPopulation((workingPop+1)%2));
+        sol = selectOp.select(this->getPopulation((workingPop+1)%2));
 
-        this->getWorkingPopulation().insert_sol(i,sol_fit.first,sol_fit.second);
+        this->getWorkingPopulation().insert_sol(i,sol.first,sol.second);
     }
 }
 
 void AGG::cross(Problem * problem){
     for(int i = 0; i < nCross; i += 2){
         
+        //cross cambia las soluciones
         crosOp->cross(
             this->getWorkingPopulation().getSolution(i), 
             this->getWorkingPopulation().getSolution(i + 1),
             problem
         );
         
+        //Siempre que se cambien las soluciones se actualiza el fitness
         this->updateFitness(i,problem);
         this->updateFitness(i+1,problem);
         
@@ -82,8 +84,10 @@ void AGG::cross(Problem * problem){
 void AGG::mutate(Problem * problem){
     for(int i = 0; i < nMutate; ++i){
 
+        //Se cambia la solucion
         mutateOp.mutate(this->getWorkingPopulation().getSolution(i));
 
+        //Siempre que se cambie la solucion se actualiza el fitness
         this->updateFitness(i,problem);
     }
 }

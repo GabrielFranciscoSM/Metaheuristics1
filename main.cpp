@@ -36,7 +36,7 @@ void printUsage(const char* progName) {
   std::cerr << "Usage: " << progName << " [options]\n\n"
             << "Options:\n"
             << "  -f <file_spec>   Specify file number (0, 1, 2, 3) or 4 for all. Default: 0\n"
-            << "  -a <algo_spec>   Specify algorithm (AGG,AGE,AM) or 'all'. Default: random \n"
+            << "  -a <algo_spec>   Specify algorithm (AGG,AGE,AM) or 'all'. Default: ALL \n"
             << "  -o <cross_op>    Specify cross operator (ordered,unordered) or 'all'. Default: all \n"
             << "  -t               Enable terminal output                                   \n"
             << "  -s <seed file>   Set the problem seeds to the one given in the seed file. \n"
@@ -60,7 +60,7 @@ void tablePrint(std::ostream &out, string name, tFitness bestFitness, float mean
   bestFitness << "," << 
   meanFit/5.0 << "," << 
   meanTime.count()/5.0 << "," <<
-  meanEvals/5.0 << endl; 
+  meanEvals/5.0 << endl;  
 }
 
 int main(int argc, char *argv[]) {
