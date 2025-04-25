@@ -2,6 +2,8 @@
 #include <iostream>
 #include <util.h>
 
+int iteraciones = 0;
+
 AM::AM(int LSfase, float LSpercentage, bool orderPob, int LSmaxEvals,cross_operators _crossOp, Problem * problem): 
 AG(_crossOp,problem),
 AGG(_crossOp,problem),
@@ -23,14 +25,14 @@ ResultMH AM::optimize(Problem *problem, int maxevals){
     tSolution bestSol;
     int generations = 0;    
 
-    evaluations = 0;
+    evaluations = POP_SIZE;
 
     while(evaluations < maxevals){
         
         this->select();
-
         this->cross(problem);
         this->mutate(problem);
+        this->evaluate(problem);
 
         //Busqueda local
         generations++;
@@ -78,7 +80,7 @@ int AM::applyLocalSearch(Problem *problem, int evaluations, int maxEvals){
         vector<int> orderedIndex = this->getWorkingPopulation().getSortedIndex();
 
         while(i < LSsize && realMaxEvals > 0){
-            ResultMH res = LS.optimizeSolution(this->getWorkingPopulation().getSolution(orderedIndex.at(i)),problem,realMaxEvals);
+            ResultMH res = LS.optimize(problem,this->getWorkingPopulation().getSolution(orderedIndex.at(i)),this->getWorkingPopulation().getFitness(orderedIndex.at(i)),realMaxEvals);
             this->getWorkingPopulation().insert_sol(orderedIndex.at(i),res.solution,res.fitness);
             evaluations += res.evaluations;
     
@@ -89,7 +91,7 @@ int AM::applyLocalSearch(Problem *problem, int evaluations, int maxEvals){
     }
     else{
         while(i < LSsize && realMaxEvals > 0){
-            ResultMH res = LS.optimizeSolution(this->getWorkingPopulation().getSolution(i),problem,realMaxEvals);
+            ResultMH res = LS.optimize(problem,this->getWorkingPopulation().getSolution(i),this->getWorkingPopulation().getFitness(i),realMaxEvals);
             this->getWorkingPopulation().insert_sol(i,res.solution,res.fitness);
             evaluations += res.evaluations;
     

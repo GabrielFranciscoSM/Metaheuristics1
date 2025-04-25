@@ -215,7 +215,7 @@ int main(int argc, char *argv[]) {
       tFitness bestFitness = 0;
       int meanEvals = 0;
 
-      std::chrono::duration<double> meanTime;
+      std::chrono::duration<double> meanTime = std::chrono::duration<double>(0);
 
       //Compute 5 times and take mean to minimize randomization
       for(int j = 0; j < 5; ++j){
@@ -238,10 +238,10 @@ int main(int argc, char *argv[]) {
       }
 
       //usualPrint(out,algoritmos[i].first,bestSol,bestFitness,(float)meanFit,meanTime,(float)meanEvals);
-      tablePrint(out,algoritmos[i].first,bestFitness,(float)meanFit,meanTime,(float)meanEvals);
+      tablePrint(out,algoritmos[i].first,bestFitness,(float)meanFit,meanTime/5,(float)meanEvals);
       //Terminal output
       if(outputMode == "terminal"){
-        usualPrint(std::cout,algoritmos[i].first,bestSol,bestFitness,(float)meanFit,meanTime,(float)meanEvals);
+        usualPrint(std::cout,algoritmos[i].first,bestSol,bestFitness,(float)meanFit,meanTime/5,(float)meanEvals);
       }
     }
 

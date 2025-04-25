@@ -12,6 +12,7 @@ protected:
 
     int workingPop;
     
+    vector<int> sols_mutated;
 public:
 
     AGG(cross_operators _crossOp, Problem * problem);
@@ -32,5 +33,7 @@ public:
     void cross(Problem * problem) override;
 
     void mutate(Problem * problem) override;
+
+    void evaluate(Problem * problem);
 
 };

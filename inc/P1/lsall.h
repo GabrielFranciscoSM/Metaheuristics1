@@ -1,5 +1,5 @@
 #pragma once
-#include <mh.h>
+#include <mhtrayectory.h>
 
 using namespace std;
 
@@ -11,10 +11,10 @@ using namespace std;
  * @see MH
  * @see Problem
  */
-class LocalSearchLl : public MH {
+class LocalSearchLl : public MHTrayectory {
 
 public:
-    LocalSearchLl() : MH() {}
+    LocalSearchLl() : MHTrayectory() {}
     virtual ~LocalSearchLl() {}
   // Implement the MH interface methods
   /**
@@ -26,6 +26,5 @@ public:
    * @param maxevals Maximum number of evaluations allowed
    * @return A pair containing the best solution found and its fitness
    */
-  ResultMH optimize(Problem *problem, int maxevals) override;
-  ResultMH optimizeSolution(tSolution & Sol, Problem * problem, int maxevals);
+  ResultMH optimize(Problem *problem, const tSolution &current, tFitness fitness, int maxevals) override;
 };

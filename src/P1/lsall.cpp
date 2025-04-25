@@ -4,25 +4,10 @@
 
 using namespace std;
 
-/**
- * From a random solution, generate a neighbour solution changing
- * a node from one outside the solution, compare both solutions
- * and pick the best
- *
- * @param problem The problem to be optimized
- * @param maxevals Maximum number of evaluations allowed
- * @return A pair containing the best solution found and its fitness
- */
-ResultMH LocalSearchLl::optimize(Problem *problem, int maxevals)
-{
-  tSolution initialSolution = problem->createSolution();
-  return optimizeSolution(initialSolution, problem, maxevals);
-}
-
-ResultMH LocalSearchLl::optimizeSolution(tSolution & Sol, Problem * problem, int maxevals){
+ResultMH LocalSearchLl::optimize(Problem * problem, const tSolution & current,tFitness fitness, int maxevals){
   assert(maxevals > 0);
 
-  tSolution best = Sol;
+  tSolution best = current;
   float best_fitness = problem->fitness(best);
 
   // We pick a random node, checking that it isn't in the solution

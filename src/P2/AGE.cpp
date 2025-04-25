@@ -7,9 +7,11 @@ AGE::AGE(cross_operators _crossOp, Problem * problem) :
     AG(_crossOp,problem) {
 
     realDist = std::uniform_real_distribution<float>(0,1);
+}
 
+ResultMH AGE::optimize(Problem *problem, int maxevals){
     this->generatePopulation(problem,this->population);
-
+    evaluations = POP_SIZE;
     int auxBestFit = 0;
     int auxWorstFit = 1000;
     for(int i = 0; i < POP_SIZE; ++i){
@@ -21,14 +23,7 @@ AGE::AGE(cross_operators _crossOp, Problem * problem) :
             auxWorstFit = population.getFitness(i);
             worstSol = i;
         }
-
     }
-
-}
-
-ResultMH AGE::optimize(Problem *problem, int maxevals){
-    
-    evaluations = 0;
 
     while(evaluations < maxevals){
 
@@ -42,15 +37,24 @@ ResultMH AGE::optimize(Problem *problem, int maxevals){
         if(fit1 < fit2){
             fit1 = fit2;
             sols.first = sols.second;
-        }
-            
+        }  
 
+        //De esta manera bestSol apuntará a la nueva mejor solución, que se econtrará en worstSol
         if(this->population.getFitness(bestSol) < fit1){
             bestSol = worstSol;
         }
 
         if(this->population.getFitness(worstSol) < fit1){
             this->population.insert_sol(worstSol,sols.first,fit1);
+        }
+
+        auxWorstFit = this->population.getFitness(bestSol);
+
+        for(int i = 0; i < POP_SIZE; ++i){
+            if(population.getFitness(i) < auxWorstFit){
+                auxWorstFit = population.getFitness(i);
+                worstSol = i;
+            }
         }
     }
 
