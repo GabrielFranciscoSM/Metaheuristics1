@@ -1,7 +1,43 @@
 name,bestFitness,meanFit,meanTime,meanEvals
-Genetic generational ordered,14.1,13.42,0.139074,1006.6
-Genetic stationary ordered,12.8,12.8,0.0941237,1000
-Memetic ordered,14.5,13.68,0.102072,1010.6
-Genetic generational unordered,15,13.74,0.130174,1014.8
-Genetic stationary unordered,14.3,14.3,0.187575,1000
-Memetic unoredered,14.5,13.9,0.102587,1011.6
+Genetic generational ordered
+Best solution:    5092 4517 3815 3003 1891 1271 4693 273 263 101 
+Best fitness:     13.8
+Mean fitness:     13.26
+Computation time: 0.661415 seconds
+Evaluations:      1007.6
+
+Genetic stationary ordered
+Best solution:    3383 2894 2388 2083 1298 1185 545 263 101 41 
+Best fitness:     13.4
+Mean fitness:     12.9
+Computation time: 0.500693 seconds
+Evaluations:      1000
+
+Memetic ordered
+Best solution:    4035 4018 4198 1968 1271 1061 628 273 263 101 
+Best fitness:     14.5
+Mean fitness:     13.94
+Computation time: 0.539413 seconds
+Evaluations:      1019.2
+
+Genetic generational unordered
+Best solution:    1897 303 1272 3742 1295 545 1271 4018 3761 4019 
+Best fitness:     14.4
+Mean fitness:     13.88
+Computation time: 0.664988 seconds
+Evaluations:      1013
+
+Genetic stationary unordered
+Best solution:    964 1269 3754 4512 545 596 101 1271 137 299 
+Best fitness:     14.1
+Mean fitness:     13.02
+Computation time: 0.532506 seconds
+Evaluations:      1000
+
+Memetic unoredered all
+Best solution:    1543 103 259 1300 101 44 1482 2662 273 283 
+Best fitness:     14.5
+Mean fitness:     14.1
+Computation time: 0.573564 seconds
+Evaluations:      1012.4
+

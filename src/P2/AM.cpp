@@ -12,7 +12,7 @@ orderPob(orderPob),
 LSmaxEvals(LSmaxEvals){
     assert(orderPob >= 0 && orderPob <= 1);
 
-    LSsize = ceil(POP_SIZE*orderPob);
+    LSsize = ceil(POP_SIZE*LSpercentage);
 }
 
 ResultMH AM::optimize(Problem *problem, int maxevals){
@@ -90,9 +90,15 @@ int AM::applyLocalSearch(Problem *problem, int evaluations, int maxEvals){
         }
     }
     else{
+
+        std::uniform_int_distribution<int> randDist(0,POP_SIZE-1);
+
         while(i < LSsize && realMaxEvals > 0){
-            ResultMH res = LS.optimize(problem,this->getWorkingPopulation().getSolution(i),this->getWorkingPopulation().getFitness(i),realMaxEvals);
-            this->getWorkingPopulation().insert_sol(i,res.solution,res.fitness);
+
+            int sol = Random::get(randDist);
+
+            ResultMH res = LS.optimize(problem,this->getWorkingPopulation().getSolution(sol),this->getWorkingPopulation().getFitness(sol),realMaxEvals);
+            this->getWorkingPopulation().insert_sol(sol,res.solution,res.fitness);
             evaluations += res.evaluations;
     
             realMaxEvals = min(LSmaxEvals,maxEvals-evaluations);

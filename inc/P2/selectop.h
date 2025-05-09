@@ -11,5 +11,5 @@ class SelectOp{
     public:
 
     SelectOp(int popSize);
-    pair<tSolution,tFitness> select(Population & pop);
+    pair<tSolution,tFitness> select(Population & pop, int tournamentsSize = 3);
 };

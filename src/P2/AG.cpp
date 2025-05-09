@@ -6,7 +6,6 @@ AG::AG(cross_operators _crossOp, Problem * problem) :
     selectOp(SelectOp(POP_SIZE)), 
     mutateOp(MutateOp(problem))
      {
-    
 
     switch (_crossOp)
     {

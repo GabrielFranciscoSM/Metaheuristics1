@@ -161,12 +161,18 @@ int main(int argc, char *argv[]) {
 
     Problem *problem = dynamic_cast<Problem *>(&pi);
 
+    LocalSearchEarlyStop LSE = LocalSearchEarlyStop();
+    LocalSearchLl LS = LocalSearchLl();
+    RandomSearch RS = RandomSearch();
+    GreedySearch GS = GreedySearch();
     AGG agg_o(AG::cross_operators::ordered,problem);
     AGE age_o(AG::cross_operators::ordered,problem);
     AM  am_o(LSfase,LSpercentage,orderPob,LSmaxEvals,AG::cross_operators::ordered,problem);
     AGG agg_u(AG::cross_operators::unordered,problem);
     AGE age_u(AG::cross_operators::unordered,problem);
     AM  am_u(LSfase,LSpercentage,orderPob,LSmaxEvals,AG::cross_operators::unordered,problem);
+    AM  am_u_01(10,0.1,false,LSmaxEvals,AG::cross_operators::unordered,problem);
+    AM  am_u_01_mej(10,0.1,orderPob,LSmaxEvals,AG::cross_operators::unordered,problem);
   
     //Logic for algorithms choosing
     vector<pair<string, MH *>> algoritmos;
@@ -183,8 +189,11 @@ int main(int argc, char *argv[]) {
     }else if(algoSpec == "AM"){
       if(cross_op == "ordered" || cross_op == "all")
         algoritmos.push_back(make_pair("Memetic ordered",&am_o));
-      if(cross_op == "ordered" || cross_op == "all")
+      if(cross_op == "ordered" || cross_op == "all"){
         algoritmos.push_back(make_pair("Memetic unoredered",&am_u));
+        algoritmos.push_back(make_pair("Memetic unoredered partial",&am_u_01));
+        algoritmos.push_back(make_pair("Memetic unoredered partial upgraded",&am_u_01_mej));
+      }
     }else{
       if(cross_op == "ordered" || cross_op == "all"){
         algoritmos.push_back(make_pair("Genetic generational ordered", &agg_o));
@@ -195,8 +204,15 @@ int main(int argc, char *argv[]) {
       if(cross_op == "ordered" || cross_op == "all"){
         algoritmos.push_back(make_pair("Genetic generational unordered", &agg_u));
         algoritmos.push_back(make_pair("Genetic stationary unordered",&age_u));
-        algoritmos.push_back(make_pair("Memetic unoredered",&am_u));
+        algoritmos.push_back(make_pair("Memetic unoredered all",&am_u));
+        algoritmos.push_back(make_pair("Memetic unoredered partial",&am_u_01));
+        algoritmos.push_back(make_pair("Memetic unoredered partial upgraded",&am_u_01_mej));
       }
+
+      algoritmos.push_back(make_pair("Greedy Search", &GS));
+      algoritmos.push_back(make_pair("Random Search", &RS));
+      algoritmos.push_back(make_pair("Local Search Early Stop", &LSE));
+      algoritmos.push_back(make_pair("Local Search", &LS));
     }
     
     //Output for the file
@@ -237,11 +253,11 @@ int main(int argc, char *argv[]) {
         }
       }
 
-      //usualPrint(out,algoritmos[i].first,bestSol,bestFitness,(float)meanFit,meanTime,(float)meanEvals);
-      tablePrint(out,algoritmos[i].first,bestFitness,(float)meanFit,meanTime/5,(float)meanEvals);
+      usualPrint(out,algoritmos[i].first,bestSol,bestFitness,(float)meanFit,meanTime,(float)meanEvals);
+      //tablePrint(out,algoritmos[i].first,bestFitness,(float)meanFit,meanTime,(float)meanEvals);
       //Terminal output
       if(outputMode == "terminal"){
-        usualPrint(std::cout,algoritmos[i].first,bestSol,bestFitness,(float)meanFit,meanTime/5,(float)meanEvals);
+        usualPrint(std::cout,algoritmos[i].first,bestSol,bestFitness,(float)meanFit,meanTime,(float)meanEvals);
       }
     }
 

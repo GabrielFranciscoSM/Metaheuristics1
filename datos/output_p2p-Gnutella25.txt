@@ -1,7 +1,13 @@
 name,bestFitness,meanFit,meanTime,meanEvals
-Genetic generational ordered,11.9,11.56,0.0454748,1006.6
-Genetic stationary ordered,11.2,10.76,0.0300634,1000
-Memetic ordered,11.9,11.7,0.0406244,1009.6
-Genetic generational unordered,11.9,11.64,0.0463477,1014.8
-Genetic stationary unordered,11.5,11.42,0.0403502,1000
-Memetic unoredered,11.9,11.62,0.0404158,1010.4
+Genetic generational ordered,11.9,11.38,0.220089,1007.6
+Genetic stationary ordered,11.9,11.34,0.181144,1000
+Memetic ordered,11.9,11.58,0.216204,1015
+Genetic generational unordered,11.9,11.62,0.23456,1013.4
+Genetic stationary unordered,11.9,11.44,0.19367,1000
+Memetic unoredered all,11.9,11.66,0.216673,1012.2
+Memetic unoredered partial,11.9,11.66,0.236593,1007.6
+Memetic unoredered partial upgraded,11.9,11.52,0.233593,1008.2
+Greedy Search,13.3,13.3,0.0136554,1
+Random Search,11.1,11,0.0769422,1000
+Local Search Early Stop,11.1,10.66,0.00500807,40.4
+Local Search,11.9,11.74,0.214458,1000
