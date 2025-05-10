@@ -1,13 +1,22 @@
 name,bestFitness,meanFit,meanTime,meanEvals
-Genetic generational ordered,11.3,11.3,0.214385,1007.4
-Genetic stationary ordered,11.8,11.38,0.197959,1000
-Memetic ordered,11.9,11.48,0.202778,1018.2
-Genetic generational unordered,11.9,11.44,0.229253,1014.4
-Genetic stationary unordered,11.9,11.38,0.194458,1000
-Memetic unoredered all,11.9,11.7,0.215027,1012.4
-Memetic unoredered partial,11.9,11.62,0.22845,1008.6
-Memetic unoredered partial upgraded,11.9,11.58,0.228487,1011.8
-Greedy Search,12.6,12.6,0.00464434,1
-Random Search,11.3,11.24,0.096219,1000
-Local Search Early Stop,11.1,10.62,0.00497202,37.4
-Local Search,11.9,11.58,0.211702,1000
+grasp NOBL
+Best solution:    4299 5884 5758 5337 2798 4182 4109 2446 3473 2455 
+Best fitness:     12.3
+Mean fitness:     12.28
+Computation time: 0.14368 seconds
+Evaluations:      10
+
+grasp SIBL
+Best solution:    242 5884 2278 2392 5337 3473 1585 2798 3723 2455 
+Best fitness:     12.4
+Mean fitness:     12.32
+Computation time: 0.241323 seconds
+Evaluations:      251.6
+
+grasp SIBLALL
+Best solution:    3473 2455 3971 5884 5337 2392 4304 5497 4443 6159 
+Best fitness:     12.5
+Mean fitness:     12.36
+Computation time: 4.06964 seconds
+Evaluations:      10000
+

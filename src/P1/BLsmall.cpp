@@ -14,12 +14,13 @@ using namespace std;
  * @param maxevals Maximum number of evaluations allowed
  * @return A pair containing the best solution found and its fitness
  */
-ResultMH LocalSearchEarlyStop::optimize(Problem *problem, int maxevals)
+
+ResultMH LocalSearchEarlyStop::optimize(Problem *problem, const tSolution &current, tFitness fitness, int maxevals)
 {
   assert(maxevals > 0);
 
-  tSolution best = problem->createSolution();
-  float best_fitness = problem->fitness(best);
+  tSolution best = current;
+  float best_fitness = fitness;
 
   int noImprove = 0;
   int i = 0;

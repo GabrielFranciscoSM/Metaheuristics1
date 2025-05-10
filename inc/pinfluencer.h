@@ -41,6 +41,8 @@ public:
   /// @return Vector de los vecinos del nodo
   vector<tDomain> getInfluence(int node){return graph.at(node);}
 
+  vector<vector<int>> getGraph(){return graph;}
+
   //----------Problem Functions----------
 
   tFitness fitness(const tSolution &solution) override;

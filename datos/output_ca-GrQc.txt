@@ -1,43 +1,22 @@
 name,bestFitness,meanFit,meanTime,meanEvals
-Genetic generational ordered
-Best solution:    5092 4517 3815 3003 1891 1271 4693 273 263 101 
-Best fitness:     13.8
-Mean fitness:     13.26
-Computation time: 0.661415 seconds
-Evaluations:      1007.6
+grasp NOBL
+Best solution:    2125 103 1278 283 296 279 265 297 295 262 
+Best fitness:     17.1
+Mean fitness:     16.58
+Computation time: 0.150042 seconds
+Evaluations:      10
 
-Genetic stationary ordered
-Best solution:    3383 2894 2388 2083 1298 1185 545 263 101 41 
-Best fitness:     13.4
-Mean fitness:     12.9
-Computation time: 0.500693 seconds
-Evaluations:      1000
+grasp SIBL
+Best solution:    3586 264 77 159 277 279 1284 301 4021 1282 
+Best fitness:     17.1
+Mean fitness:     16.82
+Computation time: 0.423274 seconds
+Evaluations:      255.2
 
-Memetic ordered
-Best solution:    4035 4018 4198 1968 1271 1061 628 273 263 101 
-Best fitness:     14.5
-Mean fitness:     13.94
-Computation time: 0.539413 seconds
-Evaluations:      1019.2
-
-Genetic generational unordered
-Best solution:    1897 303 1272 3742 1295 545 1271 4018 3761 4019 
-Best fitness:     14.4
-Mean fitness:     13.88
-Computation time: 0.664988 seconds
-Evaluations:      1013
-
-Genetic stationary unordered
-Best solution:    964 1269 3754 4512 545 596 101 1271 137 299 
-Best fitness:     14.1
-Mean fitness:     13.02
-Computation time: 0.532506 seconds
-Evaluations:      1000
-
-Memetic unoredered all
-Best solution:    1543 103 259 1300 101 44 1482 2662 273 283 
-Best fitness:     14.5
-Mean fitness:     14.1
-Computation time: 0.573564 seconds
-Evaluations:      1012.4
+grasp SIBLALL
+Best solution:    282 103 295 1284 299 72 101 1267 269 4031 
+Best fitness:     18
+Mean fitness:     17.78
+Computation time: 11.5819 seconds
+Evaluations:      10000
 

@@ -29,6 +29,13 @@
 #include "AG.h"
 #include "AM.h"
 
+//P3
+
+#include <BMB.h>
+#include <ILS.h>
+#include <ES.h>
+#include <GRASP.h>
+
 using namespace std;
 
 // Function to print usage instructions
@@ -113,6 +120,13 @@ int main(int argc, char *argv[]) {
     "../datos/p2p-Gnutella25.txt"
   };
 
+  int fileSize[] = {
+    5242,
+    8846,
+    6301,
+    22687
+  };
+
   //Prefixed seeds for deterministic results
 
   //Prefixed seeds for deterministic results
@@ -146,7 +160,6 @@ int main(int argc, char *argv[]) {
   else  
     from_file=nfile;
 
-
     int LSfase = 10;
     float LSpercentage = 1;
     bool orderPob = true;
@@ -161,6 +174,25 @@ int main(int argc, char *argv[]) {
 
     Problem *problem = dynamic_cast<Problem *>(&pi);
 
+    vector<pair<string, MH *>> algoritmos;
+
+
+    BMB bmb = BMB();
+    ILS ils = ILS();
+    ES es = ES(fileSize[f]);
+    GRASP graspNOBL = GRASP(GRASP::graspType::NOBL);
+    GRASP graspSIBL = GRASP(GRASP::graspType::SIBL);
+    GRASP graspSIBLALL = GRASP(GRASP::graspType::SIBLALL);
+
+    //algoritmos.push_back(make_pair("Busqueda multiarranque Básica",&bmb));
+    //algoritmos.push_back(make_pair("ILS",&ils));
+    algoritmos.push_back(make_pair("grasp NOBL",&graspNOBL));
+    algoritmos.push_back(make_pair("grasp SIBL",&graspSIBL));
+    algoritmos.push_back(make_pair("grasp SIBLALL",&graspSIBLALL));
+
+
+    cout << "Problem size: " << fileSize[f] << endl;
+/*
     LocalSearchEarlyStop LSE = LocalSearchEarlyStop();
     LocalSearchLl LS = LocalSearchLl();
     RandomSearch RS = RandomSearch();
@@ -173,9 +205,9 @@ int main(int argc, char *argv[]) {
     AM  am_u(LSfase,LSpercentage,orderPob,LSmaxEvals,AG::cross_operators::unordered,problem);
     AM  am_u_01(10,0.1,false,LSmaxEvals,AG::cross_operators::unordered,problem);
     AM  am_u_01_mej(10,0.1,orderPob,LSmaxEvals,AG::cross_operators::unordered,problem);
+
   
     //Logic for algorithms choosing
-    vector<pair<string, MH *>> algoritmos;
     if(algoSpec == "AGG"){
       if(cross_op == "ordered" || cross_op == "all")
         algoritmos.push_back(make_pair("Genetic generational ordered", &agg_o));
@@ -214,7 +246,9 @@ int main(int argc, char *argv[]) {
       algoritmos.push_back(make_pair("Local Search Early Stop", &LSE));
       algoritmos.push_back(make_pair("Local Search", &LS));
     }
-    
+
+    */
+
     //Output for the file
     string output = "../datos/output_";
     output.append(files[f].substr(9));
