@@ -1,20 +1,22 @@
-Best solution:    3903 13788 15020 940 9791 19408 19680 18910 15892 2156 
-Best fitness:     11.1
-Mean fitness:     11
-Computation time: 19.7117 seconds
-Evaluations:      1000
-Best solution:    3125 11490 7506 10571 16514 2156 11537 17403 8407 1065 
-Best fitness:     12.3
-Mean fitness:     12.02
-Computation time: 22.5439 seconds
-Evaluations:      1000
-Best solution:    10991 17488 9810 8723 9348 21164 10824 9086 7585 5908 
-Best fitness:     11.1
-Mean fitness:     10.66
-Computation time: 22.549 seconds
-Evaluations:      40.4
-Best solution:    11537 3002 2156 3125 10652 21392 12861 17403 2985 20055 
-Best fitness:     13.3
-Mean fitness:     13.3
-Computation time: 22.5621 seconds
-Evaluations:      1
+name,bestFitness,meanFit,meanTime,meanEvals
+grasp NOBL
+Best solution:    2609 3002 11537 3125 10652 21392 7143 1400 2156 17266 
+Best fitness:     13.2
+Mean fitness:     12.74
+Computation time: 0.561606 seconds
+Evaluations:      10
+
+grasp SIBL
+Best solution:    2609 3002 11537 3125 10652 21392 7143 1400 2156 17266 
+Best fitness:     13.2
+Mean fitness:     12.98
+Computation time: 0.684753 seconds
+Evaluations:      264.4
+
+grasp SIBLALL
+Best solution:    2609 3002 11537 3125 10652 21392 7143 1400 2156 17266 
+Best fitness:     13.2
+Mean fitness:     13.1
+Computation time: 5.30079 seconds
+Evaluations:      10000
+

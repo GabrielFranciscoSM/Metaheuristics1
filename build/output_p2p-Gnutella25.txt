@@ -1,5 +1,0 @@
-Best solution:    8453 17488 9810 8723 9348 17947 10824 9086 7505 5908 
-Best fitness:     11.9
-Mean fitness:     11.74
-Computation time: 0.211945 seconds
-Evaluations:      1000

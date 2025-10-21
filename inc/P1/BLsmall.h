@@ -1,5 +1,5 @@
 #pragma once
-#include <mh.h>
+#include <mhtrayectory.h>
 
 using namespace std;
 
@@ -11,10 +11,10 @@ using namespace std;
  * @see MH
  * @see Problem
  */
-class LocalSearchEarlyStop : public MH {
+class LocalSearchEarlyStop : public MHTrayectory {
 
 public:
-LocalSearchEarlyStop() : MH() {}
+LocalSearchEarlyStop() : MHTrayectory() {}
     virtual ~LocalSearchEarlyStop() {}
   // Implement the MH interface methods
   /**
@@ -27,5 +27,6 @@ LocalSearchEarlyStop() : MH() {}
    * @param maxevals Maximum number of evaluations allowed
    * @return A pair containing the best solution found and its fitness
    */
-  ResultMH optimize(Problem *problem, int maxevals) override;
+  ResultMH optimize(Problem *problem, const tSolution &current, tFitness fitness, int maxevals) override;
+
 };

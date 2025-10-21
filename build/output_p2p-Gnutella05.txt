@@ -1,5 +1,0 @@
-Best solution:    4285 4666 3825 2655 5516 2937 4220 830 2957 710 
-Best fitness:     11.9
-Mean fitness:     11.9
-Computation time: 0.26741 seconds
-Evaluations:      1000

@@ -3,7 +3,7 @@
 
 class AGG : virtual public AG{
 
-private:
+protected:
 
     int nMutate;
     int nCross;
@@ -12,12 +12,16 @@ private:
 
     int workingPop;
     
+    vector<int> sols_mutated;
 public:
 
-    AGG(cross_operators _crossOp, Problem * Problem);
+    AGG(cross_operators _crossOp, Problem * problem);
     virtual ~AGG() = default;
 
-    ResultMH optimize(Problem *problem, int maxevals) override;
+    void setCrossOp(cross_operators _crossOp);
+
+
+    virtual ResultMH optimize(Problem *problem, int maxevals) override;
 
 //private:
     Population & getPopulation(int i);
@@ -29,5 +33,7 @@ public:
     void cross(Problem * problem) override;
 
     void mutate(Problem * problem) override;
+
+    void evaluate(Problem * problem);
 
 };

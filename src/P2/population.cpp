@@ -31,6 +31,20 @@ void Population::print_pop(){
     }
 }
 
-bool Population::findSolution(tSolution sol){
+bool Population::findSolution(tSolution & sol){
     return (find(this->population.begin(),this->population.end(),sol) == this->population.end());
+}
+
+vector<int> Population::getSortedIndex(){
+
+    vector<int> index(this->getPopulationSize());
+
+    for(int i = 0; i < this->getPopulationSize(); ++i){
+        index.at(i) = i;
+    }
+
+
+    sort(index.begin(),index.end(),[this](int &a, int &b){ return this->getFitness(a) > this->getFitness(b); });
+
+    return index;
 }

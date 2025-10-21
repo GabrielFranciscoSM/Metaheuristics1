@@ -1,0 +1,22 @@
+name,bestFitness,meanFit,meanTime,meanEvals
+grasp NOBL
+Best solution:    2125 103 1278 283 296 279 265 297 295 262 
+Best fitness:     17.1
+Mean fitness:     16.58
+Computation time: 0.150042 seconds
+Evaluations:      10
+
+grasp SIBL
+Best solution:    3586 264 77 159 277 279 1284 301 4021 1282 
+Best fitness:     17.1
+Mean fitness:     16.82
+Computation time: 0.423274 seconds
+Evaluations:      255.2
+
+grasp SIBLALL
+Best solution:    282 103 295 1284 299 72 101 1267 269 4031 
+Best fitness:     18
+Mean fitness:     17.78
+Computation time: 11.5819 seconds
+Evaluations:      10000
+

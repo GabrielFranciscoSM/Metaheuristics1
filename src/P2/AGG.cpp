@@ -4,81 +4,97 @@
 
 AGG::AGG(cross_operators _crossOp, Problem * problem) : 
     population{Population(POP_SIZE), Population(POP_SIZE)},
-    AG(_crossOp,problem) {
+    AG(_crossOp,problem),
+    sols_mutated() {
 
     nMutate = ceil(MUTATE_PROB*POP_SIZE);
     nCross = ceil(CROSS_PROB*POP_SIZE/2) * 2;
-
-    workingPop = 1;
-    this->generatePopulation(problem,this->population[0]);
-
 }
 
 ResultMH AGG::optimize(Problem *problem, int maxevals){
-    int bestSolI = 0;
+    this->generatePopulation(problem,this->population[0]);
+    workingPop = 1;
+
     float bestFit = 0;
     tSolution bestSol;
-    
-    while(this->evaluations < maxevals){
-        cerr << "EVALUATIONS: " << evaluations << ", Working pop: " << workingPop <<  endl;
-        cerr << "OLD POP: " << endl;
-        this->getWorkingPopulation().print_pop();
 
+    evaluations = POP_SIZE;
+    while(evaluations < maxevals){
         this->select();
-        cerr << "SELECT POP: " << endl;
-        this->getWorkingPopulation().print_pop();
-        
         this->cross(problem);
-        cerr << "CROSS POP: " << this->nCross << endl;
-        this->getWorkingPopulation().print_pop();
-
         this->mutate(problem);
-        cerr << "MUTATE POP: " << this->nMutate << endl;
-        this->getWorkingPopulation().print_pop();
+        this->evaluate(problem);
 
+        //elitismo
+        int auxWorstFitness = bestFit;
+        int auxWorstIt = 0;
+        bool downgraded = true;
 
-        workingPop = (workingPop+1)%2;
-    }
+        for(int i = 0; i < POP_SIZE; ++i){
+            if(this->getWorkingPopulation().getFitness(i) >= bestFit){
+                downgraded = false;
+                bestFit = this->getWorkingPopulation().getFitness(i);
+                bestSol = this->getWorkingPopulation().getSolution(i);
+            }    
 
-    for(int i = 0; i < POP_SIZE; ++i){
-        if(this->getPopulation((workingPop+1)%2).getFitness(i) > bestFit){
-            bestFit = this->getPopulation((workingPop+1)%2).getFitness(i);
-            bestSolI = i;
+            if(this->getWorkingPopulation().getFitness(i) <= auxWorstFitness){
+                auxWorstFitness = this->getWorkingPopulation().getFitness(i);
+                auxWorstIt = i;
+            }
         }
+
+        if(downgraded){
+            this->getWorkingPopulation().insert_sol(auxWorstIt,bestSol,bestFit);
+        }
+
+        workingPop = (workingPop + 1) % 2;
     }
 
-    return ResultMH(bestSol,bestFit,10);
+    return ResultMH(bestSol,bestFit,evaluations);
 }
 
 
 void AGG::select(){
-    pair<tSolution,tFitness> sol_fit;
+    pair<tSolution,tFitness> sol;
 
     for(int i = 0; i < POP_SIZE; ++i){
-        sol_fit = selectOp.select(this->getPopulation((workingPop+1)%2));
+        sol = selectOp.select(this->getPopulation((workingPop+1)%2));
 
-        this->getWorkingPopulation().insert_sol(i,sol_fit.first,sol_fit.second);
+        this->getWorkingPopulation().insert_sol(i,sol.first,sol.second);
     }
 }
 
 void AGG::cross(Problem * problem){
     for(int i = 0; i < nCross; i += 2){
+        
+        //cross cambia las soluciones
         crosOp->cross(
             this->getWorkingPopulation().getSolution(i), 
             this->getWorkingPopulation().getSolution(i + 1),
             problem
         );
-        this->updateFitness(i,problem);
-        this->updateFitness(i+1,problem);
+        
     }
 }
 
 void AGG::mutate(Problem * problem){
+
+    sols_mutated.clear();
+    std::uniform_int_distribution<int> dist_pop = std::uniform_int_distribution<int>(
+        0,
+        POP_SIZE-1
+    );
+
     for(int i = 0; i < nMutate; ++i){
 
-        mutateOp.mutate(this->getWorkingPopulation().getSolution(i));
+        int index = Random::get(dist_pop);
+        //Se cambia la solucion
+        mutateOp.mutate(this->getWorkingPopulation().getSolution(index));
 
-        this->updateFitness(i,problem);
+        //Siempre que se cambie la solucion se actualiza el fitness
+        if(index >= nCross){
+            sols_mutated.push_back(index);
+        }
     }
 }
 
@@ -93,4 +109,18 @@ Population & AGG::getWorkingPopulation(){
 void AGG::updateFitness(int i, Problem * problem){
     this->getWorkingPopulation().set_fitness(i,problem->fitness(this->getWorkingPopulation().getSolution(i)));
     evaluations++;
+}
+
+
+void AGG::evaluate(Problem * problem){
+    for(int i = 0; i < nCross; ++i){
+        updateFitness(i,problem);
+    }
+
+    for(int i = 0; i < sols_mutated.size(); ++i){
+        
+        updateFitness(sols_mutated.at(i),problem);
+    }
+
+    sols_mutated.clear();
 }

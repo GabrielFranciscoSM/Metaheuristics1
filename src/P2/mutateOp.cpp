@@ -15,6 +15,11 @@ MutateOp::MutateOp(Problem * prob){
 
 void MutateOp::mutate(tSolution & sol){
 
-    sol.at(Random::get(dist_size)) = Random::get(dist_range);
+    int newnode = Random::get(dist_range);
+
+    while(std::find(sol.begin(),sol.end(),newnode) != sol.end())
+        newnode = Random::get(dist_range);
+
+    sol.at(Random::get(dist_size)) = newnode;
 
 }

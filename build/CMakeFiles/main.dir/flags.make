@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/gabriel/clase/MH/P1/common -I/home/gabriel/clase/MH/P1/inc -I/home/gabriel/clase/MH/P1/inc/P1 -I/home/gabriel/clase/MH/P1/inc/P2
+CXX_INCLUDES = -I/home/gabriel/clase/MH/Production/software/common -I/home/gabriel/clase/MH/Production/software/inc -I/home/gabriel/clase/MH/Production/software/inc/P1 -I/home/gabriel/clase/MH/Production/software/inc/P2 -I/home/gabriel/clase/MH/Production/software/inc/P3
 
 CXX_FLAGS = 
 

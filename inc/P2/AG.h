@@ -26,7 +26,7 @@ protected:
     
 public:
 
-    AG(cross_operators _crossOp, Problem * Problem);
+    AG(cross_operators _crossOp, Problem * problem);
     virtual ~AG() = default;
 
     virtual ResultMH optimize(Problem *problem, int maxevals) = 0;

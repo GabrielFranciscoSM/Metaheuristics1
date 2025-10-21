@@ -1,5 +1,0 @@
-Best solution:    4013 5866 366 5186 2991 3121 4486 15 2405 6159 
-Best fitness:     11.9
-Mean fitness:     11.58
-Computation time: 0.207685 seconds
-Evaluations:      1000

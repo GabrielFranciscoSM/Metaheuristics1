@@ -1,0 +1,5 @@
+name,bestFitness,meanFit,meanTime,meanEvals
+Memetic ordered,11.9,11.9,0.963591,4000
+Memetic unoredered,12.1,11.94,0.989855,4000
+Memetic unoredered partial,11.9,11.9,1.054,4010.4
+Memetic unoredered partial upgraded,11.9,11.9,1.05124,4010
